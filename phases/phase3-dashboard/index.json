@@ -1,0 +1,24 @@
+{
+  "project": "costflow",
+  "phase": "phase3-dashboard",
+  "steps": [
+    {
+      "step": 1,
+      "name": "auth-layout-home",
+      "status": "completed",
+      "started_at": "2026-06-05T04:51:37+0900",
+      "summary": "Route group 기반 인증 레이아웃, NavBar, 대시보드 홈을 추가했다."
+    },
+    {
+      "step": 2,
+      "name": "api-key-routes",
+      "status": "pending"
+    },
+    {
+      "step": 3,
+      "name": "settings-ui",
+      "status": "pending"
+    }
+  ],
+  "created_at": "2026-06-05T04:51:37+0900"
+}
