@@ -1,12 +1,12 @@
 # 수정 이력
 
 > 세션 작업이 끝나면 한 줄 추가: `- YYYY-MM-DD · 작업: 요약`
-> 버그는 `원인`·`수정`을 들여쓰기로 기록.
+> 버그는 `원인`과 `수정`을 함께 기록합니다.
 
 ---
 
 - 2026-06-05 · Phase 0 스파이크: transcript 파싱 PoC, hook payload 스키마 확인
-- 2026-06-05 · Phase 1 스캐폴드: npm workspaces 모노레포, harness 부트스트랩, plan/fix/docs 체계 수립
-- 2026-06-05 · 구조 변경: apps/web/ → apps/ (web 서브디렉토리 제거), git 초기화 및 GitHub push
-- 2026-06-05 · Phase 2: Supabase 클라이언트 설치, 7개 테이블 린 스키마 마이그레이션, RLS 정책(21개), Auth 미들웨어 + 콜백 라우트 + 로그인 페이지 생성, build 통과
-- 2026-06-05 · Phase 3: 인증 레이아웃, API key CRUD, Settings UI
+- 2026-06-05 · Phase 1 스캐폴드: npm workspaces 모노레포, harness 부트스트랩, plan/fix/docs 체계 정리
+- 2026-06-05 · 구조 변경: `apps/web/` → `apps/`, git 초기화 및 GitHub push
+- 2026-06-05 · Phase 2: Supabase 클라이언트 설치, 7개 테이블 기본 스키마 마이그레이션, RLS 정책 21개, Auth middleware + callback route + login page 생성, build/typecheck 통과
+- 2026-06-05 · Phase 3: 인증 레이아웃, API key CRUD, Settings UI, build/typecheck 통과

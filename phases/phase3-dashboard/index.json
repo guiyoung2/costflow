@@ -7,7 +7,7 @@
       "name": "auth-layout-home",
       "status": "completed",
       "started_at": "2026-06-05T04:51:37+0900",
-      "summary": "인증 route group, dashboard layout, NavBar, 홈 화면을 구성하고 build/typecheck를 통과했다.",
+      "summary": "인증 route group, dashboard layout, NavBar, 홈 화면을 구성하고 build/typecheck를 통과했습니다.",
       "completed_at": "2026-06-05T05:03:03+0900"
     },
     {
@@ -15,7 +15,7 @@
       "name": "api-key-routes",
       "status": "completed",
       "started_at": "2026-06-05T05:03:04+0900",
-      "summary": "API key 발급/목록/삭제 route handler와 ApiKey 타입을 추가하고 build/typecheck를 통과했다.",
+      "summary": "API key 발급/목록/삭제 route handler와 ApiKey 타입을 추가하고 build/typecheck를 통과했습니다.",
       "completed_at": "2026-06-05T05:04:50+0900"
     },
     {
