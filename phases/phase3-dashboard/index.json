@@ -7,7 +7,7 @@
       "name": "auth-layout-home",
       "status": "completed",
       "started_at": "2026-06-05T04:51:37+0900",
-      "summary": "Route group 기반 인증 레이아웃, NavBar, 대시보드 홈을 추가했다."
+      "summary": "인증 route group, dashboard layout, NavBar, 홈 화면을 구성하고 build/typecheck를 통과했다."
     },
     {
       "step": 2,
