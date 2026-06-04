@@ -1,0 +1,19 @@
+{
+  "name": "@costflow/cli",
+  "version": "0.1.0",
+  "private": true,
+  "bin": {
+    "costflow": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "typescript": "^5"
+  }
+}

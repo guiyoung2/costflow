@@ -1,0 +1,20 @@
+{
+  "name": "costflow",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=apps",
+    "build": "npm run build --workspace=apps && npm run build --workspace=packages/cli",
+    "build:web": "npm run build --workspace=apps",
+    "build:cli": "npm run build --workspace=packages/cli",
+    "lint": "npm run lint --workspace=apps",
+    "typecheck": "npm run typecheck --workspace=apps && npm run typecheck --workspace=packages/cli"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
