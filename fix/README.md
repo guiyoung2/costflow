@@ -8,3 +8,4 @@
 - 2026-06-05 · Phase 0 스파이크: transcript 파싱 PoC, hook payload 스키마 확인
 - 2026-06-05 · Phase 1 스캐폴드: npm workspaces 모노레포, harness 부트스트랩, plan/fix/docs 체계 수립
 - 2026-06-05 · 구조 변경: apps/web/ → apps/ (web 서브디렉토리 제거), git 초기화 및 GitHub push
+- 2026-06-05 · Phase 2: Supabase 클라이언트 설치, 7개 테이블 린 스키마 마이그레이션, RLS 정책(21개), Auth 미들웨어 + 콜백 라우트 + 로그인 페이지 생성, build 통과

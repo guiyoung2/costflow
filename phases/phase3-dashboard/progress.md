@@ -1,17 +1,13 @@
 # phase3-dashboard 진행 현황
 
 ## 마지막 업데이트
-2026-06-05 05:00 KST — Step 1 auth-layout-home 완료
+2026-06-05T05:03:03+0900 — Step 1/3 완료
 
 ## 완료된 작업
-- Step 1: auth-layout-home
-  - `/login`을 `(auth)` route group으로 이동했다.
-  - `/` 홈을 `(dashboard)` route group으로 이동했다.
-  - 인증 사용자용 `(dashboard)/layout.tsx`와 `NavBar`를 구성했다.
-  - 홈 화면에 로그인 이메일, Settings 안내, 연결된 프로젝트 0개 placeholder를 표시했다.
+- Step 1: auth-layout-home — 인증 route group, dashboard layout, NavBar, 홈 화면을 구성하고 build/typecheck를 통과했다.
 
 ## 현재 진행 중
-- 없음
+- Step 2: api-key-routes
 
 ## 다음 할 일
 - Step 2: api-key-routes
