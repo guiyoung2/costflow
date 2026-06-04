@@ -49,3 +49,8 @@
 - [ ] Supabase 프로젝트 생성 (hosted 또는 local)
 - [ ] `.env.local` 설정 (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`)
 - [ ] `/harness`로 Phase 2 step 분해 + 승인 후 `python3 scripts/execute.py <phase-dir>` 실행
+## Phase 3 완료
+
+- 완료일: 2026-06-05
+- 범위: 인증 레이아웃, API key CRUD route, Settings UI
+- 다음 단계: Phase 4 CLI / Hook Runner 시작 대기
