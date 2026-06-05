@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import EmptyState from "@/components/EmptyState";
+import TableSkeleton from "@/components/TableSkeleton";
 import type { Project } from "@/types/project";
 
 export default function ProjectsPage() {
@@ -64,65 +66,70 @@ export default function ProjectsPage() {
   }
 
   return (
-    <main style={{ maxWidth: "960px", margin: "40px auto", padding: "0 24px" }}>
-      <h1>Projects</h1>
+    <main className="max-w-[960px] mx-auto py-10 px-6">
+      <h1 className="text-2xl font-bold text-slate-100">Projects</h1>
 
-      {error ? <p style={{ color: "#b00020" }}>{error}</p> : null}
+      {error ? <p className="text-red-400 mt-3 text-sm">{error}</p> : null}
 
-      <table style={{ width: "100%", marginTop: "20px", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th style={cellStyle}>이름</th>
-            <th style={cellStyle}>세션 수</th>
-            <th style={cellStyle}>마지막 활동</th>
-            <th style={cellStyle}>생성일</th>
-            <th style={cellStyle}>삭제</th>
-          </tr>
-        </thead>
-        <tbody>
-          {loading ? (
-            <tr>
-              <td style={cellStyle} colSpan={5}>
-                불러오는 중...
-              </td>
-            </tr>
-          ) : projects.length === 0 ? (
-            <tr>
-              <td style={cellStyle} colSpan={5}>
-                연결된 프로젝트가 없습니다.
-              </td>
-            </tr>
-          ) : (
-            projects.map((project) => (
-              <tr key={project.id}>
-                <td style={cellStyle}>{project.name}</td>
-                <td style={cellStyle}>{project.session_count}</td>
-                <td style={cellStyle}>
-                  {project.last_active_at
-                    ? new Date(project.last_active_at).toLocaleString()
-                    : "—"}
-                </td>
-                <td style={cellStyle}>{new Date(project.created_at).toLocaleString()}</td>
-                <td style={cellStyle}>
-                  <button
-                    type="button"
-                    onClick={() => void handleDelete(project.id)}
-                    disabled={deletingIds.has(project.id)}
-                  >
-                    {deletingIds.has(project.id) ? "삭제 중..." : "삭제"}
-                  </button>
-                </td>
+      {loading ? (
+        <div className="mt-5">
+          <TableSkeleton rows={4} cols={5} />
+        </div>
+      ) : projects.length === 0 ? (
+        <EmptyState message="연결된 프로젝트가 없습니다." />
+      ) : (
+        <div className="overflow-x-auto rounded-xl border border-white/10 mt-5">
+          <table className="table-auto w-full text-sm">
+            <thead>
+              <tr className="bg-surface-card">
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">
+                  이름
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">
+                  세션 수
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">
+                  마지막 활동
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">
+                  생성일
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">
+                  삭제
+                </th>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+              {projects.map((project) => (
+                <tr key={project.id} className="table-row-hover border-t border-white/5">
+                  <td className="px-4 py-3 text-white font-semibold">{project.name}</td>
+                  <td className="px-4 py-3 text-slate-400 text-sm tabular-nums">
+                    {project.session_count}
+                  </td>
+                  <td className="px-4 py-3 text-slate-400 text-sm">
+                    {project.last_active_at
+                      ? new Date(project.last_active_at).toLocaleString()
+                      : "—"}
+                  </td>
+                  <td className="px-4 py-3 text-slate-400 text-sm">
+                    {new Date(project.created_at).toLocaleString()}
+                  </td>
+                  <td className="px-4 py-3">
+                    <button
+                      type="button"
+                      onClick={() => void handleDelete(project.id)}
+                      disabled={deletingIds.has(project.id)}
+                      className="text-slate-600 hover:text-red-400 text-xs px-2 py-1 rounded hover:bg-red-500/10 transition-all"
+                    >
+                      {deletingIds.has(project.id) ? "삭제 중..." : "삭제"}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </main>
   );
 }
-
-const cellStyle = {
-  borderBottom: "1px solid #ddd",
-  padding: "10px",
-  textAlign: "left",
-} satisfies React.CSSProperties;

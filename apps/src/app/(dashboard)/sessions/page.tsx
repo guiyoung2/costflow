@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import EmptyState from "@/components/EmptyState";
+import TableSkeleton from "@/components/TableSkeleton";
 import type { Project } from "@/types/project";
 import type { Session } from "@/types/session";
 
@@ -113,38 +115,32 @@ export default function SessionsPage() {
 
       {error ? <p className="text-red-400 mt-3 text-sm">{error}</p> : null}
 
-      <div className="overflow-x-auto rounded-xl border border-white/10 mt-5">
-        <table className="table-auto w-full text-sm">
-          <thead>
-            <tr className="bg-surface-card">
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">프로젝트</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Session ID</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">시작 시간</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">종료 시간</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">모델</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Input</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Output</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Cache Creation</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Cache Read</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Tool</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">삭제</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td className="text-slate-500 py-12 text-center" colSpan={11}>
-                  불러오는 중...
-                </td>
+      {loading ? (
+        <div className="mt-5">
+          <TableSkeleton rows={5} cols={11} />
+        </div>
+      ) : sessions.length === 0 ? (
+        <EmptyState message="세션이 없습니다." />
+      ) : (
+        <div className="overflow-x-auto rounded-xl border border-white/10 mt-5">
+          <table className="table-auto w-full text-sm">
+            <thead>
+              <tr className="bg-surface-card">
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">프로젝트</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Session ID</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">시작 시간</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">종료 시간</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">모델</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Input</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Output</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Cache Creation</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Cache Read</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Tool</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">삭제</th>
               </tr>
-            ) : sessions.length === 0 ? (
-              <tr>
-                <td className="text-slate-500 py-12 text-center" colSpan={11}>
-                  세션이 없습니다.
-                </td>
-              </tr>
-            ) : (
-              sessions.map((s) => (
+            </thead>
+            <tbody>
+              {sessions.map((s) => (
                 <tr key={s.id} className="table-row-hover border-t border-white/5">
                   <td className="px-4 py-3 text-brand-400 font-medium">{s.project_name}</td>
                   <td className="px-4 py-3 text-slate-300">{s.session_id_ext.slice(0, 8)}</td>
@@ -181,11 +177,11 @@ export default function SessionsPage() {
                     </button>
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </main>
   );
 }

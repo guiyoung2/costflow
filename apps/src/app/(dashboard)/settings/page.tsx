@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import EmptyState from "@/components/EmptyState";
+import TableSkeleton from "@/components/TableSkeleton";
 import type { ApiKey } from "@/types/api-key";
 
 type CreateKeyResponse = {
@@ -115,26 +117,26 @@ export default function SettingsPage() {
   }
 
   return (
-    <main style={{ maxWidth: "960px", margin: "40px auto", padding: "0 24px" }}>
-      <h1>Settings</h1>
+    <main className="max-w-[960px] mx-auto py-10 px-6">
+      <h1 className="text-2xl font-bold text-slate-100">Settings</h1>
 
-      <section style={{ marginTop: "32px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <h2 style={{ margin: 0 }}>API Keys</h2>
+      <section className="mt-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-slate-200 font-semibold text-sm uppercase tracking-wide">
+            API Keys
+          </h2>
           <button
             type="button"
             onClick={() => setShowCreateForm((v) => !v)}
             disabled={creating}
+            className="btn-primary text-sm py-1.5"
           >
             {showCreateForm ? "취소" : "새 API Key 발급"}
           </button>
         </div>
 
         {showCreateForm ? (
-          <form
-            onSubmit={(e) => void handleCreateKey(e)}
-            style={{ marginTop: "16px", display: "flex", gap: "8px", alignItems: "center" }}
-          >
+          <form onSubmit={(e) => void handleCreateKey(e)} className="flex gap-2 mt-4 mb-4">
             <input
               type="text"
               placeholder="API Key 이름"
@@ -143,99 +145,84 @@ export default function SettingsPage() {
               maxLength={200}
               required
               autoFocus
-              style={{ padding: "6px 10px", flex: "1", maxWidth: "320px" }}
+              className="input-field max-w-xs"
             />
-            <button type="submit" disabled={creating || !newKeyName.trim()}>
+            <button type="submit" disabled={creating || !newKeyName.trim()} className="btn-primary">
               {creating ? "발급 중..." : "발급"}
             </button>
           </form>
         ) : null}
 
-        {error ? <p style={{ color: "#b00020" }}>{error}</p> : null}
+        {error ? <p className="text-red-400 text-sm mb-3">{error}</p> : null}
 
-        <table
-          style={{
-            width: "100%",
-            marginTop: "20px",
-            borderCollapse: "collapse",
-          }}
-        >
-          <thead>
-            <tr>
-              <th style={cellStyle}>이름</th>
-              <th style={cellStyle}>Prefix</th>
-              <th style={cellStyle}>발급일</th>
-              <th style={cellStyle}>상태</th>
-              <th style={cellStyle}>삭제</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loadingKeys ? (
-              <tr>
-                <td style={cellStyle} colSpan={5}>
-                  불러오는 중...
-                </td>
-              </tr>
-            ) : keys.length === 0 ? (
-              <tr>
-                <td style={cellStyle} colSpan={5}>
-                  발급된 API key가 없습니다.
-                </td>
-              </tr>
-            ) : (
-              keys.map((key) => (
-                <tr key={key.id}>
-                  <td style={cellStyle}>{key.name}</td>
-                  <td style={cellStyle}>{key.key_prefix}</td>
-                  <td style={cellStyle}>{new Date(key.created_at).toLocaleString()}</td>
-                  <td style={cellStyle}>{key.is_active ? "활성" : "비활성"}</td>
-                  <td style={cellStyle}>
-                    <button
-                      type="button"
-                      onClick={() => void handleDeleteKey(key.id)}
-                      disabled={deletingIds.has(key.id)}
-                    >
-                      {deletingIds.has(key.id) ? "삭제 중..." : "삭제"}
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        {loadingKeys ? (
+          <TableSkeleton rows={3} cols={4} />
+        ) : keys.length === 0 ? (
+          <EmptyState message="발급된 API key가 없습니다." />
+        ) : (
+          <div className="divide-y divide-white/10 rounded-xl border border-white/10 overflow-hidden">
+            {keys.map((key) => (
+              <div
+                key={key.id}
+                className="bg-surface-card px-4 py-3 flex items-center justify-between hover:bg-white/5 transition-colors"
+              >
+                <div className="flex items-center gap-4 min-w-0 flex-wrap">
+                  <span className="text-slate-200 font-medium text-sm">{key.name}</span>
+                  <span className="font-mono text-xs bg-black/30 border border-white/10 px-2 py-1 rounded text-slate-400">
+                    {key.key_prefix}...
+                  </span>
+                  <span className="text-slate-500 text-xs">
+                    {new Date(key.created_at).toLocaleString()}
+                  </span>
+                  <span className={`text-xs ${key.is_active ? "text-emerald-400" : "text-slate-500"}`}>
+                    {key.is_active ? "활성" : "비활성"}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void handleDeleteKey(key.id)}
+                  disabled={deletingIds.has(key.id)}
+                  className="text-slate-600 hover:text-red-400 text-xs px-2 py-1 rounded hover:bg-red-500/10 transition-all shrink-0"
+                >
+                  {deletingIds.has(key.id) ? "삭제 중..." : "삭제"}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
 
         {newKeyPlain ? (
-          <section
-            style={{
-              marginTop: "24px",
-              padding: "16px",
-              border: "1px solid #ddd",
-            }}
-          >
-            <p>이 키는 지금만 볼 수 있습니다. 안전한 곳에 저장하세요.</p>
-            <pre style={{ overflowX: "auto" }}>{newKeyPlain}</pre>
-            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-              <button type="button" onClick={() => void handleCopyKey()}>
+          <div className="mt-6 bg-surface-card border border-brand-500/30 rounded-xl p-5">
+            <p className="text-amber-400 text-sm font-medium mb-3">
+              이 키는 지금만 볼 수 있습니다. 안전한 곳에 저장하세요.
+            </p>
+            <code className="font-mono text-xs bg-black/30 border border-white/10 px-3 py-2 rounded block text-slate-300 break-all">
+              {newKeyPlain}
+            </code>
+            <div className="flex gap-2 items-center mt-3">
+              <button
+                type="button"
+                onClick={() => void handleCopyKey()}
+                className="text-brand-400 hover:text-brand-300 text-xs px-2 py-1 rounded hover:bg-brand-500/10 transition-all"
+              >
                 복사
               </button>
               {copyStatus === "copied" ? (
-                <span style={{ color: "#007700" }}>복사됨</span>
+                <span className="text-emerald-400 text-xs">복사됨</span>
               ) : copyStatus === "failed" ? (
-                <span style={{ color: "#b00020" }}>복사 실패 — 수동으로 복사하세요</span>
+                <span className="text-red-400 text-xs">복사 실패 — 수동으로 복사하세요</span>
               ) : null}
-              <button type="button" onClick={() => setNewKeyPlain(null)}>
+              <button
+                type="button"
+                onClick={() => setNewKeyPlain(null)}
+                className="btn-ghost text-xs py-1 px-3"
+              >
                 확인했습니다
               </button>
             </div>
-          </section>
+          </div>
         ) : null}
       </section>
     </main>
   );
 }
-
-const cellStyle = {
-  borderBottom: "1px solid #ddd",
-  padding: "10px",
-  textAlign: "left",
-} satisfies React.CSSProperties;
