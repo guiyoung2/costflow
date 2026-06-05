@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { runInit } from './commands/init';
+import { runFlush } from './commands/flush';
 import { runStatus } from './commands/status';
 import { runUninstall } from './commands/uninstall';
 
@@ -36,7 +37,9 @@ switch (command) {
     runUninstall();
     break;
   case 'flush':
-    console.log('flush: not implemented yet');
+    runFlush().catch((err: unknown) => {
+      console.error('Error:', err);
+    });
     break;
   default:
     showHelp();
