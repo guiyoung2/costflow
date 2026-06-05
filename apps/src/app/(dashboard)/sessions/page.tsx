@@ -89,14 +89,19 @@ export default function SessionsPage() {
   }
 
   return (
-    <main style={{ maxWidth: "1200px", margin: "40px auto", padding: "0 24px" }}>
-      <h1>Sessions</h1>
+    <main className="max-w-[1200px] mx-auto py-10 px-6">
+      <h1 className="text-2xl font-bold text-slate-100">Sessions</h1>
 
-      <div style={{ marginTop: "16px" }}>
-        <label htmlFor="project-filter" style={{ marginRight: "8px" }}>
+      <div className="mt-4 flex items-center gap-2">
+        <label htmlFor="project-filter" className="text-sm text-slate-400">
           프로젝트:
         </label>
-        <select id="project-filter" value={projectFilter} onChange={handleFilterChange}>
+        <select
+          id="project-filter"
+          value={projectFilter}
+          onChange={handleFilterChange}
+          className="bg-surface-card border border-white/10 text-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+        >
           <option value="">전체</option>
           {projects.map((p) => (
             <option key={p.id} value={p.id}>
@@ -106,74 +111,81 @@ export default function SessionsPage() {
         </select>
       </div>
 
-      {error ? <p style={{ color: "#b00020", marginTop: "12px" }}>{error}</p> : null}
+      {error ? <p className="text-red-400 mt-3 text-sm">{error}</p> : null}
 
-      <table style={{ width: "100%", marginTop: "20px", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th style={cellStyle}>프로젝트</th>
-            <th style={cellStyle}>Session ID</th>
-            <th style={cellStyle}>시작 시간</th>
-            <th style={cellStyle}>종료 시간</th>
-            <th style={cellStyle}>모델</th>
-            <th style={cellStyle}>Input</th>
-            <th style={cellStyle}>Output</th>
-            <th style={cellStyle}>Cache Creation</th>
-            <th style={cellStyle}>Cache Read</th>
-            <th style={cellStyle}>Tool</th>
-            <th style={cellStyle}>삭제</th>
-          </tr>
-        </thead>
-        <tbody>
-          {loading ? (
-            <tr>
-              <td style={cellStyle} colSpan={11}>
-                불러오는 중...
-              </td>
+      <div className="overflow-x-auto rounded-xl border border-white/10 mt-5">
+        <table className="table-auto w-full text-sm">
+          <thead>
+            <tr className="bg-surface-card">
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">프로젝트</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Session ID</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">시작 시간</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">종료 시간</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">모델</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Input</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Output</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Cache Creation</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Cache Read</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Tool</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">삭제</th>
             </tr>
-          ) : sessions.length === 0 ? (
-            <tr>
-              <td style={cellStyle} colSpan={11}>
-                세션이 없습니다.
-              </td>
-            </tr>
-          ) : (
-            sessions.map((s) => (
-              <tr key={s.id}>
-                <td style={cellStyle}>{s.project_name}</td>
-                <td style={cellStyle}>{s.session_id_ext.slice(0, 8)}</td>
-                <td style={cellStyle}>
-                  {s.started_at ? new Date(s.started_at).toLocaleString() : "-"}
-                </td>
-                <td style={cellStyle}>
-                  {s.ended_at ? new Date(s.ended_at).toLocaleString() : "-"}
-                </td>
-                <td style={cellStyle}>{s.model ?? "-"}</td>
-                <td style={cellStyle}>{s.total_input_tokens.toLocaleString()}</td>
-                <td style={cellStyle}>{s.total_output_tokens.toLocaleString()}</td>
-                <td style={cellStyle}>{s.total_cache_creation_tokens.toLocaleString()}</td>
-                <td style={cellStyle}>{s.total_cache_read_tokens.toLocaleString()}</td>
-                <td style={cellStyle}>{s.tool_call_count.toLocaleString()}</td>
-                <td style={cellStyle}>
-                  <button
-                    type="button"
-                    onClick={() => void handleDelete(s.id)}
-                    disabled={deletingIds.has(s.id)}
-                  >
-                    {deletingIds.has(s.id) ? "삭제 중..." : "삭제"}
-                  </button>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td className="text-slate-500 py-12 text-center" colSpan={11}>
+                  불러오는 중...
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : sessions.length === 0 ? (
+              <tr>
+                <td className="text-slate-500 py-12 text-center" colSpan={11}>
+                  세션이 없습니다.
+                </td>
+              </tr>
+            ) : (
+              sessions.map((s) => (
+                <tr key={s.id} className="table-row-hover border-t border-white/5">
+                  <td className="px-4 py-3 text-brand-400 font-medium">{s.project_name}</td>
+                  <td className="px-4 py-3 text-slate-300">{s.session_id_ext.slice(0, 8)}</td>
+                  <td className="px-4 py-3 text-slate-500 text-xs">
+                    {s.started_at ? new Date(s.started_at).toLocaleString() : "-"}
+                  </td>
+                  <td className="px-4 py-3 text-slate-500 text-xs">
+                    {s.ended_at ? new Date(s.ended_at).toLocaleString() : "-"}
+                  </td>
+                  <td className="px-4 py-3 text-slate-300">{s.model ?? "-"}</td>
+                  <td className="px-4 py-3 tabular-nums text-right text-slate-400">
+                    {s.total_input_tokens.toLocaleString()}
+                  </td>
+                  <td className="px-4 py-3 tabular-nums text-right text-slate-400">
+                    {s.total_output_tokens.toLocaleString()}
+                  </td>
+                  <td className="px-4 py-3 tabular-nums text-right text-slate-400">
+                    {s.total_cache_creation_tokens.toLocaleString()}
+                  </td>
+                  <td className="px-4 py-3 tabular-nums text-right text-slate-400">
+                    {s.total_cache_read_tokens.toLocaleString()}
+                  </td>
+                  <td className="px-4 py-3 tabular-nums text-right text-slate-400">
+                    {s.tool_call_count.toLocaleString()}
+                  </td>
+                  <td className="px-4 py-3">
+                    <button
+                      type="button"
+                      onClick={() => void handleDelete(s.id)}
+                      disabled={deletingIds.has(s.id)}
+                      className={`text-slate-600 hover:text-red-400 hover:bg-red-500/10 rounded p-1 transition-all duration-200${deletingIds.has(s.id) ? " opacity-50 cursor-not-allowed" : ""}`}
+                    >
+                      {deletingIds.has(s.id) ? "삭제 중..." : "삭제"}
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </main>
   );
 }
-
-const cellStyle = {
-  borderBottom: "1px solid #ddd",
-  padding: "10px",
-  textAlign: "left",
-} satisfies React.CSSProperties;

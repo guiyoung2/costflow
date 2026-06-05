@@ -23,3 +23,4 @@
 - 2026-06-06 · auth-pages: (auth)/layout.tsx 애니메이션 블롭 배경 생성, login/page.tsx Tailwind 글래스 카드 리디자인, signup/page.tsx 신규 생성, globals.css shadow-glow/50 @apply 오류 수정
 - 2026-06-06 · layout-nav: Sidebar.tsx 클라이언트 컴포넌트 생성(usePathname 활성 하이라이트, 로그아웃), (dashboard)/layout.tsx 사이드바 레이아웃으로 교체, NavBar.tsx 삭제, build/typecheck 통과
 - 2026-06-06 · home-usage: (dashboard)/page.tsx + usage/page.tsx 인라인 스타일 전면 Tailwind 교체, 4색 stat-card 그리드, 기간 필터 버튼그룹, 일별 테이블, Tool 섹션, 빈 상태, build/typecheck 통과
+- 2026-06-06 · sessions-prompts: sessions/page.tsx 인라인 스타일 → Tailwind(글래스 테이블+table-row-hover+tabular-nums+삭제 버튼), prompts/page.tsx 인라인 스타일 → Tailwind(sticky 필터+카드 리스트+mono 프롬프트+빈 상태), build/typecheck 통과

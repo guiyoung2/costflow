@@ -63,75 +63,68 @@ export default function PromptsPage() {
 
   function renderPromptContent(prompt: string | null) {
     if (prompt === null) {
-      return <span style={{ color: "#888" }}>[metadata only]</span>;
+      return <span className="text-slate-500 italic">[metadata only]</span>;
     }
     if (prompt === "[redacted]") {
-      return <em>[redacted]</em>;
+      return <em className="text-slate-500">[redacted]</em>;
     }
     const text = prompt.length > 200 ? prompt.slice(0, 200) + "..." : prompt;
     return <span>{text}</span>;
   }
 
   return (
-    <main style={{ maxWidth: "960px", margin: "40px auto", padding: "0 24px" }}>
-      <h1>Prompts</h1>
+    <main className="max-w-[960px] mx-auto py-10 px-6">
+      <div className="bg-surface sticky top-0 z-10 py-3">
+        <h1 className="text-2xl font-bold text-slate-100 mb-4">Prompts</h1>
+        <div className="flex items-center gap-2">
+          <label htmlFor="project-filter" className="text-sm text-slate-400">
+            프로젝트:
+          </label>
+          <select
+            id="project-filter"
+            value={projectFilter}
+            onChange={handleFilterChange}
+            className="bg-surface-card border border-white/10 text-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          >
+            <option value="">전체</option>
+            {projects.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      <div style={{ marginTop: "16px" }}>
-        <label htmlFor="project-filter" style={{ marginRight: "8px" }}>
-          프로젝트:
-        </label>
-        <select id="project-filter" value={projectFilter} onChange={handleFilterChange}>
-          <option value="">전체</option>
-          {projects.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name}
-            </option>
-          ))}
-        </select>
+        {error ? <p className="text-red-400 mt-3 text-sm">{error}</p> : null}
       </div>
 
-      {error ? <p style={{ color: "#b00020", marginTop: "12px" }}>{error}</p> : null}
-
-      <table style={{ width: "100%", marginTop: "20px", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th style={cellStyle}>시간</th>
-            <th style={cellStyle}>프로젝트</th>
-            <th style={cellStyle}>프롬프트 내용</th>
-          </tr>
-        </thead>
-        <tbody>
-          {loading ? (
-            <tr>
-              <td style={cellStyle} colSpan={3}>
-                불러오는 중...
-              </td>
-            </tr>
-          ) : prompts.length === 0 ? (
-            <tr>
-              <td style={cellStyle} colSpan={3}>
-                프롬프트 기록이 없습니다.
-              </td>
-            </tr>
-          ) : (
-            prompts.map((p) => (
-              <tr key={p.id}>
-                <td style={{ ...cellStyle, whiteSpace: "nowrap" }}>
+      {loading ? (
+        <p className="text-slate-500 py-12 text-center">불러오는 중...</p>
+      ) : prompts.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-slate-500">
+          프롬프트 기록이 없습니다.
+        </div>
+      ) : (
+        <div className="mt-4 flex flex-col gap-3">
+          {prompts.map((p) => (
+            <div
+              key={p.id}
+              className="bg-surface-card border border-white/10 rounded-xl p-4 hover:border-brand-500/30 hover:bg-white/5 transition-all duration-200"
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-slate-500 text-xs">
                   {new Date(p.timestamp).toLocaleString()}
-                </td>
-                <td style={cellStyle}>{p.project_name}</td>
-                <td style={cellStyle}>{renderPromptContent(p.prompt)}</td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+                </span>
+                <span className="text-slate-500 text-xs">·</span>
+                <span className="text-slate-500 text-xs">{p.project_name}</span>
+              </div>
+              <div className="font-mono text-sm bg-black/20 border border-white/10 p-3 rounded-lg text-slate-300 overflow-auto">
+                {renderPromptContent(p.prompt)}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </main>
   );
 }
-
-const cellStyle = {
-  borderBottom: "1px solid #ddd",
-  padding: "10px",
-  textAlign: "left",
-} satisfies React.CSSProperties;
