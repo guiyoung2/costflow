@@ -71,6 +71,20 @@ export async function GET(request: Request) {
     usageMap.set(u.session_id, existing);
   }
 
+  const toolCountMap = new Map<string, number>();
+  try {
+    const { data: toolCallRows } = await supabase
+      .from("tool_calls")
+      .select("session_id, id")
+      .in("session_id", sessionIds);
+
+    for (const row of toolCallRows ?? []) {
+      toolCountMap.set(row.session_id, (toolCountMap.get(row.session_id) ?? 0) + 1);
+    }
+  } catch {
+    // tool_call_count는 부가 정보 — 실패 시 0으로 fallback
+  }
+
   const result: Session[] = (sessions ?? []).map((s) => {
     const agg = usageMap.get(s.id) ?? {
       turn_count: 0,
@@ -93,6 +107,7 @@ export async function GET(request: Request) {
       total_output_tokens: agg.output,
       total_cache_creation_tokens: agg.cache_creation,
       total_cache_read_tokens: agg.cache_read,
+      tool_call_count: toolCountMap.get(s.id) ?? 0,
     };
   });
 

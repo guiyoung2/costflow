@@ -11,4 +11,5 @@ export type Session = {
   total_output_tokens: number;
   total_cache_creation_tokens: number;
   total_cache_read_tokens: number;
+  tool_call_count: number;
 };
