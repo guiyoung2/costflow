@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import NavBar from "@/components/NavBar";
 import { createClient } from "@/lib/supabase/server";
+import Sidebar from "@/components/Sidebar";
 
 export default async function DashboardLayout({
   children,
@@ -17,9 +17,11 @@ export default async function DashboardLayout({
   }
 
   return (
-    <>
-      <NavBar email={user.email ?? ""} />
-      {children}
-    </>
+    <div className="flex h-screen bg-surface">
+      <Sidebar />
+      <div className="flex-1 min-w-0 overflow-y-auto bg-surface">
+        <div className="p-6 md:p-8 animate-fade-in">{children}</div>
+      </div>
+    </div>
   );
 }

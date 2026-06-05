@@ -21,3 +21,4 @@
 - 2026-06-05 · tools-ui: Usage 화면에 Tool 사용량 섹션 추가, Sessions 화면에 tool_call_count 컬럼 추가, 빌드/타입체크 통과
 - 2026-06-06 · tailwind-setup: Tailwind CSS v3 설치, tailwind.config.ts + postcss.config.js + globals.css 생성, layout.tsx import 추가, build/typecheck 통과
 - 2026-06-06 · auth-pages: (auth)/layout.tsx 애니메이션 블롭 배경 생성, login/page.tsx Tailwind 글래스 카드 리디자인, signup/page.tsx 신규 생성, globals.css shadow-glow/50 @apply 오류 수정
+- 2026-06-06 · layout-nav: Sidebar.tsx 클라이언트 컴포넌트 생성(usePathname 활성 하이라이트, 로그아웃), (dashboard)/layout.tsx 사이드바 레이아웃으로 교체, NavBar.tsx 삭제, build/typecheck 통과
