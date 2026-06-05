@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { runInit } from './commands/init';
+import { runHook } from './commands/hook';
 import { runFlush } from './commands/flush';
 import { runStatus } from './commands/status';
 import { runUninstall } from './commands/uninstall';
@@ -27,8 +28,7 @@ switch (command) {
     });
     break;
   case 'hook':
-    // Must exit 0 immediately — must not block Claude Code
-    process.exit(0);
+    runHook().catch(() => process.exit(0));
     break;
   case 'status':
     runStatus();
