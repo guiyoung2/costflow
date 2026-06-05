@@ -19,3 +19,4 @@
 - 2026-06-05 · ingestion-update: processEvent에 messages INSERT(⑥) + tool_calls INSERT(⑦) 추가, 빌드/타입체크 통과
 - 2026-06-05 · tool-calls-api: GET /api/tool-calls 신규 + sessions API에 tool_call_count 추가, 빌드/타입체크 통과
 - 2026-06-05 · tools-ui: Usage 화면에 Tool 사용량 섹션 추가, Sessions 화면에 tool_call_count 컬럼 추가, 빌드/타입체크 통과
+- 2026-06-06 · tailwind-setup: Tailwind CSS v3 설치, tailwind.config.ts + postcss.config.js + globals.css 생성, layout.tsx import 추가, build/typecheck 통과
