@@ -62,3 +62,10 @@
 
 - [ ] Phase 4 step 분해 + 승인
 - [ ] `python scripts/execute.py <phase-dir>` 실행
+
+## 향후 개선사항 (Phase 6 이전 처리 권장)
+
+코드 리뷰에서 식별된 Minor 항목 — 현재 기능 동작에는 영향 없음.
+
+- [ ] `(auth)` route group에 `layout.tsx` 추가 — 로그인 페이지 중앙 정렬 레이아웃 통합 (현재 `login/page.tsx`가 인라인 스타일로 직접 처리)
+- [ ] Phase 6 진입 전 스타일링 시스템 결정 — CSS Modules 또는 Tailwind 선택 후 전체 인라인 스타일 일괄 교체 (현재 모든 컴포넌트가 인라인 스타일 사용)

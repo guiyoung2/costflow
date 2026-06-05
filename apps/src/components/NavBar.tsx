@@ -1,15 +1,22 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 type NavBarProps = { email: string };
 
 export default function NavBar({ email }: NavBarProps) {
+  const router = useRouter();
+
   async function handleSignOut() {
     const supabase = createClient();
-    await supabase.auth.signOut();
-    window.location.href = "/login";
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      alert("로그아웃에 실패했습니다. 다시 시도해주세요.");
+      return;
+    }
+    router.push("/login");
   }
 
   return (
@@ -26,7 +33,7 @@ export default function NavBar({ email }: NavBarProps) {
       <Link href="/">Home</Link>
       <Link href="/settings">Settings</Link>
       <span style={{ marginLeft: "auto", color: "#555" }}>{email}</span>
-      <button type="button" onClick={handleSignOut}>
+      <button type="button" onClick={() => void handleSignOut()}>
         로그아웃
       </button>
     </nav>

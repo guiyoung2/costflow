@@ -47,6 +47,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "name is required" }, { status: 400 });
   }
 
+  if (name.length > 200) {
+    return NextResponse.json({ error: "name is too long (max 200 chars)" }, { status: 400 });
+  }
+
   const plainKey = randomBytes(32).toString("hex");
   const keyHash = createHash("sha256").update(plainKey).digest("hex");
   const keyPrefix = plainKey.slice(0, 8);
