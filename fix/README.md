@@ -24,3 +24,4 @@
 - 2026-06-06 · layout-nav: Sidebar.tsx 클라이언트 컴포넌트 생성(usePathname 활성 하이라이트, 로그아웃), (dashboard)/layout.tsx 사이드바 레이아웃으로 교체, NavBar.tsx 삭제, build/typecheck 통과
 - 2026-06-06 · home-usage: (dashboard)/page.tsx + usage/page.tsx 인라인 스타일 전면 Tailwind 교체, 4색 stat-card 그리드, 기간 필터 버튼그룹, 일별 테이블, Tool 섹션, 빈 상태, build/typecheck 통과
 - 2026-06-06 · sessions-prompts: sessions/page.tsx 인라인 스타일 → Tailwind(글래스 테이블+table-row-hover+tabular-nums+삭제 버튼), prompts/page.tsx 인라인 스타일 → Tailwind(sticky 필터+카드 리스트+mono 프롬프트+빈 상태), build/typecheck 통과
+- 2026-06-06 · schema-agent: sessions.agent 컬럼 추가(006_codex_agent.sql), CHECK(claude|codex), 기본값 claude, NULL 행 없음, typecheck/build 통과
