@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 
+import { runInit } from './commands/init';
+import { runStatus } from './commands/status';
+import { runUninstall } from './commands/uninstall';
+
 const [, , command] = process.argv;
 
 function showHelp(): void {
@@ -15,21 +19,24 @@ Commands:
 }
 
 switch (command) {
-  case "init":
-    console.log("init: not implemented yet");
+  case 'init':
+    runInit().catch((err: unknown) => {
+      console.error('Error:', err);
+      process.exit(1);
+    });
     break;
-  case "hook":
-    // Called by Claude Code hook — must exit 0 and not block
+  case 'hook':
+    // Must exit 0 immediately — must not block Claude Code
     process.exit(0);
     break;
-  case "status":
-    console.log("status: not implemented yet");
+  case 'status':
+    runStatus();
     break;
-  case "uninstall":
-    console.log("uninstall: not implemented yet");
+  case 'uninstall':
+    runUninstall();
     break;
-  case "flush":
-    console.log("flush: not implemented yet");
+  case 'flush':
+    console.log('flush: not implemented yet');
     break;
   default:
     showHelp();
