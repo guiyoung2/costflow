@@ -38,14 +38,16 @@ export async function runHook(): Promise<void> {
         let model: string | undefined;
         let tool_use_names: string[] | undefined;
 
+        let turn_index: number | undefined;
         if (transcript_path) {
           const summary = parseTranscript(transcript_path);
           token_usage = summary.token_usage ?? undefined;
           model = summary.model ?? undefined;
           tool_use_names = summary.tool_use_names;
+          turn_index = summary.turn_index;
         }
 
-        await sendEvent({ hook_type, session_id, timestamp, token_usage, model, tool_use_names });
+        await sendEvent({ hook_type, session_id, timestamp, token_usage, model, tool_use_names, turn_index });
         break;
       }
       case 'UserPromptSubmit': {

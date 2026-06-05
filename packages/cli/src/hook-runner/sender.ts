@@ -9,6 +9,7 @@ export interface HookEvent {
   session_id: string;
   project_name: string;
   timestamp: string;
+  turn_index?: number;
   prompt?: string;
   token_usage?: TokenUsage;
   model?: string;

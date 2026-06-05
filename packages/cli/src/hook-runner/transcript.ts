@@ -12,23 +12,28 @@ export interface TranscriptSummary {
   model: string | null;
   token_usage: TokenUsage | null;
   tool_use_names: string[];
+  turn_index: number;
 }
 
 export function parseTranscript(transcriptPath: string): TranscriptSummary {
   try {
     const lines = fs.readFileSync(transcriptPath, 'utf-8').split('\n').filter((l) => l.trim());
     let lastAssistant: Record<string, unknown> | null = null;
+    let turn_index = 0;
 
     for (const line of lines) {
       try {
         const record = JSON.parse(line) as Record<string, unknown>;
-        if (record.type === 'assistant') lastAssistant = record;
+        if (record.type === 'assistant') {
+          lastAssistant = record;
+          turn_index++;
+        }
       } catch {
         // skip malformed lines
       }
     }
 
-    if (!lastAssistant) return { model: null, token_usage: null, tool_use_names: [] };
+    if (!lastAssistant) return { model: null, token_usage: null, tool_use_names: [], turn_index: 0 };
 
     const message = lastAssistant.message as Record<string, unknown> | undefined;
     const model = typeof message?.model === 'string' ? message.model : null;
@@ -55,7 +60,7 @@ export function parseTranscript(transcriptPath: string): TranscriptSummary {
       typeof cache_creation_tokens !== 'number' ||
       typeof cache_read_tokens !== 'number'
     ) {
-      return { model, token_usage: null, tool_use_names };
+      return { model, token_usage: null, tool_use_names, turn_index };
     }
 
     return {
@@ -68,8 +73,9 @@ export function parseTranscript(transcriptPath: string): TranscriptSummary {
         token_source: 'actual',
       },
       tool_use_names,
+      turn_index,
     };
   } catch {
-    return { model: null, token_usage: null, tool_use_names: [] };
+    return { model: null, token_usage: null, tool_use_names: [], turn_index: 0 };
   }
 }
