@@ -15,3 +15,4 @@
 - 2026-06-05 · Phase 5: Ingestion API 구현 — POST /api/events, API key 인증, project/session upsert, token_usage 멱등 처리, 프롬프트 저장 모드
 - 2026-06-05 · ESLint 설정: eslint-config-next v16 flat config 도입, react-hooks/set-state-in-effect 비활성화(async loadKeys 패턴)
 - 2026-06-05 · Phase 6: 대시보드 화면 — 6개 API 라우트, /projects, /usage, /sessions, /prompts, Home 실데이터 연결
+- 2026-06-05 · normalize-schema: messages/tool_calls/skill_usages/agent_usages 테이블 생성 + RLS + backfill migration 적용
