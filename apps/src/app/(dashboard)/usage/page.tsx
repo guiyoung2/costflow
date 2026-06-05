@@ -103,24 +103,21 @@ export default function UsagePage() {
   );
 
   return (
-    <main style={{ maxWidth: "960px", margin: "40px auto", padding: "0 24px" }}>
-      <h1>Usage</h1>
+    <main className="max-w-5xl mx-auto space-y-6">
+      <h1 className="text-2xl font-bold text-white">Usage</h1>
 
-      <div style={{ display: "flex", gap: "16px", alignItems: "center", marginTop: "24px", flexWrap: "wrap" }}>
-        <div style={{ display: "flex", gap: "8px" }}>
+      <div className="flex flex-wrap gap-4 items-center">
+        <div className="flex gap-1 bg-surface-card rounded-lg p-1 border border-white/10">
           {DAYS_OPTIONS.map((d) => (
             <button
               key={d}
               type="button"
               onClick={() => handleDaysChange(d)}
-              style={{
-                padding: "6px 14px",
-                fontWeight: days === d ? "bold" : "normal",
-                background: days === d ? "#0070f3" : undefined,
-                color: days === d ? "#fff" : undefined,
-                border: "1px solid #ccc",
-                cursor: "pointer",
-              }}
+              className={
+                days === d
+                  ? "bg-brand-600 text-white rounded-md px-4 py-1.5 text-sm font-medium transition-all"
+                  : "text-slate-400 hover:text-white px-4 py-1.5 text-sm rounded-md transition-colors"
+              }
             >
               {d}일
             </button>
@@ -130,7 +127,7 @@ export default function UsagePage() {
         <select
           value={projectId}
           onChange={handleProjectChange}
-          style={{ padding: "6px 10px", border: "1px solid #ccc" }}
+          className="bg-surface-card border border-white/10 rounded-lg px-3 py-1.5 text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500"
         >
           <option value="">전체 프로젝트</option>
           {projects.map((p) => (
@@ -141,99 +138,121 @@ export default function UsagePage() {
         </select>
       </div>
 
-      {error ? <p style={{ color: "#b00020", marginTop: "16px" }}>{error}</p> : null}
+      {error ? <p className="text-red-400 text-sm">{error}</p> : null}
 
-      <div style={{ display: "flex", gap: "16px", marginTop: "24px", flexWrap: "wrap" }}>
-        <SummaryCard label="Input Tokens" value={totals.input_tokens} />
-        <SummaryCard label="Output Tokens" value={totals.output_tokens} />
-        <SummaryCard label="Cache Creation Tokens" value={totals.cache_creation_tokens} />
-        <SummaryCard label="Cache Read Tokens" value={totals.cache_read_tokens} />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="stat-card border-l-2 border-l-brand-500">
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Input Tokens</p>
+          <p className="text-2xl font-bold text-brand-400 tabular-nums mt-2">
+            {totals.input_tokens.toLocaleString()}
+          </p>
+        </div>
+        <div className="stat-card border-l-2 border-l-emerald-500">
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Output Tokens</p>
+          <p className="text-2xl font-bold text-emerald-400 tabular-nums mt-2">
+            {totals.output_tokens.toLocaleString()}
+          </p>
+        </div>
+        <div className="stat-card border-l-2 border-l-purple-500">
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Cache Creation</p>
+          <p className="text-2xl font-bold text-purple-400 tabular-nums mt-2">
+            {totals.cache_creation_tokens.toLocaleString()}
+          </p>
+        </div>
+        <div className="stat-card border-l-2 border-l-amber-500">
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Cache Read</p>
+          <p className="text-2xl font-bold text-amber-400 tabular-nums mt-2">
+            {totals.cache_read_tokens.toLocaleString()}
+          </p>
+        </div>
       </div>
 
-      <div style={{ marginTop: "32px" }}>
+      <div>
         {loading ? (
-          <p>불러오는 중...</p>
+          <p className="text-slate-400 text-sm">불러오는 중...</p>
         ) : sortedUsage.length === 0 ? (
-          <p>아직 수집된 데이터가 없습니다.</p>
+          <div className="flex flex-col items-center justify-center py-16 text-slate-500">
+            <p>아직 수집된 데이터가 없습니다.</p>
+          </div>
         ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr>
-                <th style={thStyle}>날짜</th>
-                <th style={thStyle}>Input</th>
-                <th style={thStyle}>Output</th>
-                <th style={thStyle}>Cache Creation</th>
-                <th style={thStyle}>Cache Read</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedUsage.map((row) => (
-                <tr key={row.date}>
-                  <td style={tdStyle}>{row.date}</td>
-                  <td style={tdStyle}>{row.input_tokens.toLocaleString()}</td>
-                  <td style={tdStyle}>{row.output_tokens.toLocaleString()}</td>
-                  <td style={tdStyle}>{row.cache_creation_tokens.toLocaleString()}</td>
-                  <td style={tdStyle}>{row.cache_read_tokens.toLocaleString()}</td>
+          <div className="overflow-x-auto rounded-xl border border-white/10">
+            <table className="table-auto w-full text-sm">
+              <thead>
+                <tr className="bg-surface-card">
+                  <th className="text-slate-400 text-xs uppercase tracking-wide px-4 py-3 text-left">
+                    날짜
+                  </th>
+                  <th className="text-slate-400 text-xs uppercase tracking-wide px-4 py-3 text-right">
+                    Input
+                  </th>
+                  <th className="text-slate-400 text-xs uppercase tracking-wide px-4 py-3 text-right">
+                    Output
+                  </th>
+                  <th className="text-slate-400 text-xs uppercase tracking-wide px-4 py-3 text-right">
+                    Cache Creation
+                  </th>
+                  <th className="text-slate-400 text-xs uppercase tracking-wide px-4 py-3 text-right">
+                    Cache Read
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {sortedUsage.map((row) => (
+                  <tr key={row.date} className="table-row-hover border-t border-white/5 text-slate-300">
+                    <td className="px-4 py-3">{row.date}</td>
+                    <td className="px-4 py-3 tabular-nums text-right">
+                      {row.input_tokens.toLocaleString()}
+                    </td>
+                    <td className="px-4 py-3 tabular-nums text-right">
+                      {row.output_tokens.toLocaleString()}
+                    </td>
+                    <td className="px-4 py-3 tabular-nums text-right">
+                      {row.cache_creation_tokens.toLocaleString()}
+                    </td>
+                    <td className="px-4 py-3 tabular-nums text-right">
+                      {row.cache_read_tokens.toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
-      <div style={{ marginTop: "40px" }}>
-        <h2>Tool 사용량</h2>
+      <div>
+        <h2 className="text-slate-200 font-semibold text-sm uppercase tracking-wide mt-8 mb-3">
+          Tool 사용량
+        </h2>
         {toolStats.length === 0 ? (
-          <p>수집된 tool 데이터가 없습니다.</p>
+          <div className="flex flex-col items-center justify-center py-16 text-slate-500">
+            <p>수집된 tool 데이터가 없습니다.</p>
+          </div>
         ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "12px" }}>
-            <thead>
-              <tr>
-                <th style={thStyle}>Tool 이름</th>
-                <th style={thStyle}>횟수</th>
-              </tr>
-            </thead>
-            <tbody>
-              {toolStats.map((t) => (
-                <tr key={t.tool_name}>
-                  <td style={tdStyle}>{t.tool_name}</td>
-                  <td style={tdStyle}>{t.count.toLocaleString()}</td>
+          <div className="overflow-x-auto rounded-xl border border-white/10">
+            <table className="table-auto w-full text-sm">
+              <thead>
+                <tr className="bg-surface-card">
+                  <th className="text-slate-400 text-xs uppercase tracking-wide px-4 py-3 text-left">
+                    Tool 이름
+                  </th>
+                  <th className="text-slate-400 text-xs uppercase tracking-wide px-4 py-3 text-right">
+                    횟수
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {toolStats.map((t) => (
+                  <tr key={t.tool_name} className="table-row-hover border-t border-white/5 text-slate-300">
+                    <td className="px-4 py-3">{t.tool_name}</td>
+                    <td className="px-4 py-3 tabular-nums text-right">{t.count.toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </main>
   );
 }
-
-function SummaryCard({ label, value }: { label: string; value: number }) {
-  return (
-    <div
-      style={{
-        border: "1px solid #ddd",
-        padding: "16px 20px",
-        minWidth: "160px",
-      }}
-    >
-      <div style={{ fontSize: "13px", color: "#666" }}>{label}</div>
-      <div style={{ fontSize: "22px", fontWeight: "bold", marginTop: "4px" }}>
-        {value.toLocaleString()}
-      </div>
-    </div>
-  );
-}
-
-const thStyle = {
-  borderBottom: "2px solid #ddd",
-  padding: "10px",
-  textAlign: "left",
-  whiteSpace: "nowrap",
-} satisfies React.CSSProperties;
-
-const tdStyle = {
-  borderBottom: "1px solid #ddd",
-  padding: "10px",
-  textAlign: "left",
-} satisfies React.CSSProperties;
