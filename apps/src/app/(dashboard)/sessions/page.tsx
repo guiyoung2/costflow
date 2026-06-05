@@ -120,19 +120,20 @@ export default function SessionsPage() {
             <th style={cellStyle}>Output</th>
             <th style={cellStyle}>Cache Creation</th>
             <th style={cellStyle}>Cache Read</th>
+            <th style={cellStyle}>Tool</th>
             <th style={cellStyle}>삭제</th>
           </tr>
         </thead>
         <tbody>
           {loading ? (
             <tr>
-              <td style={cellStyle} colSpan={10}>
+              <td style={cellStyle} colSpan={11}>
                 불러오는 중...
               </td>
             </tr>
           ) : sessions.length === 0 ? (
             <tr>
-              <td style={cellStyle} colSpan={10}>
+              <td style={cellStyle} colSpan={11}>
                 세션이 없습니다.
               </td>
             </tr>
@@ -152,6 +153,7 @@ export default function SessionsPage() {
                 <td style={cellStyle}>{s.total_output_tokens.toLocaleString()}</td>
                 <td style={cellStyle}>{s.total_cache_creation_tokens.toLocaleString()}</td>
                 <td style={cellStyle}>{s.total_cache_read_tokens.toLocaleString()}</td>
+                <td style={cellStyle}>{s.tool_call_count.toLocaleString()}</td>
                 <td style={cellStyle}>
                   <button
                     type="button"

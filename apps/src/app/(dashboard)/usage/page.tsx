@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import type { Project } from "@/types/project";
+import type { ToolCallStat } from "@/types/tool-call";
 import type { DailyUsage } from "@/types/usage";
 
 const DAYS_OPTIONS = [7, 30, 90] as const;
@@ -11,6 +12,7 @@ type DaysOption = (typeof DAYS_OPTIONS)[number];
 export default function UsagePage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [usage, setUsage] = useState<DailyUsage[]>([]);
+  const [toolStats, setToolStats] = useState<ToolCallStat[]>([]);
   const [days, setDays] = useState<DaysOption>(30);
   const [projectId, setProjectId] = useState<string>("");
   const [loading, setLoading] = useState(true);
@@ -21,9 +23,10 @@ export default function UsagePage() {
       setLoading(true);
       setError(null);
       try {
-        const [projectsRes, usageRes] = await Promise.all([
+        const [projectsRes, usageRes, toolRes] = await Promise.all([
           fetch("/api/projects"),
           fetch("/api/usage?days=30"),
+          fetch("/api/tool-calls?days=30").catch(() => null),
         ]);
         const projectsBody = (await projectsRes.json()) as {
           projects?: Project[];
@@ -37,6 +40,10 @@ export default function UsagePage() {
         if (!usageRes.ok) throw new Error(usageBody.error ?? "사용량 데이터를 불러오지 못했습니다.");
         setProjects(projectsBody.projects ?? []);
         setUsage(usageBody.usage ?? []);
+        if (toolRes?.ok) {
+          const toolBody = (await toolRes.json()) as { tool_calls?: ToolCallStat[] };
+          setToolStats(toolBody.tool_calls ?? []);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.");
       } finally {
@@ -52,10 +59,19 @@ export default function UsagePage() {
     try {
       const params = new URLSearchParams({ days: String(nextDays) });
       if (nextProjectId) params.set("project_id", nextProjectId);
-      const res = await fetch(`/api/usage?${params.toString()}`);
+      const [res, toolRes] = await Promise.all([
+        fetch(`/api/usage?${params.toString()}`),
+        fetch(`/api/tool-calls?${params.toString()}`).catch(() => null),
+      ]);
       const body = (await res.json()) as { usage?: DailyUsage[]; error?: string };
       if (!res.ok) throw new Error(body.error ?? "사용량 데이터를 불러오지 못했습니다.");
       setUsage(body.usage ?? []);
+      if (toolRes?.ok) {
+        const toolBody = (await toolRes.json()) as { tool_calls?: ToolCallStat[] };
+        setToolStats(toolBody.tool_calls ?? []);
+      } else {
+        setToolStats([]);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.");
     } finally {
@@ -158,6 +174,30 @@ export default function UsagePage() {
                   <td style={tdStyle}>{row.output_tokens.toLocaleString()}</td>
                   <td style={tdStyle}>{row.cache_creation_tokens.toLocaleString()}</td>
                   <td style={tdStyle}>{row.cache_read_tokens.toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      <div style={{ marginTop: "40px" }}>
+        <h2>Tool 사용량</h2>
+        {toolStats.length === 0 ? (
+          <p>수집된 tool 데이터가 없습니다.</p>
+        ) : (
+          <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "12px" }}>
+            <thead>
+              <tr>
+                <th style={thStyle}>Tool 이름</th>
+                <th style={thStyle}>횟수</th>
+              </tr>
+            </thead>
+            <tbody>
+              {toolStats.map((t) => (
+                <tr key={t.tool_name}>
+                  <td style={tdStyle}>{t.tool_name}</td>
+                  <td style={tdStyle}>{t.count.toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>
