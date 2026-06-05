@@ -286,13 +286,14 @@ class StepExecutor:
             f"   - 사용자 개입이 필요한 경우 (API 키, 인증, 수동 설정 등) → \"blocked\" + \"blocked_reason\" 기록 후 즉시 중단\n"
             f"6. 모든 변경사항을 커밋하라:\n"
             f"   {commit_example}\n"
-            f"7. 이 step 완료 후 반드시 다음 두 파일을 업데이트하라:\n"
+            f"7. 이 step 완료 후 반드시 다음 파일들을 업데이트하라:\n"
             f"   a. phases/{self._phase_dir_name}/progress.md — '다음 할 일'과 '주의사항' 섹션을 현재 상태 기준으로 갱신\n"
             f"      ('다음 할 일': 다음 step에서 해야 할 것, 필요한 준비사항)\n"
             f"      ('주의사항': 이 step에서 발견한 트랩, 외부 의존성, 중요 설정값 등)\n"
             f"   b. phases/{self._phase_dir_name}/feature_list.json — 이 step에서 완료된 feature를 업데이트:\n"
             f"      passes: true, verified_at: ISO-8601 현재 시각, verified_by_step: <현재 step 번호>\n"
-            f"   (두 파일이 없으면 스킵)\n\n---\n\n"
+            f"   c. fix/README.md — 이 step에서 수행한 작업을 한 줄 추가: `- YYYY-MM-DD · <step-name>: <요약>`\n"
+            f"   (파일이 없으면 스킵)\n\n---\n\n"
         )
 
     @staticmethod
@@ -304,6 +305,24 @@ class StepExecutor:
                 return True, data.get("result", "session limit reached")
         except (json.JSONDecodeError, TypeError):
             pass
+        return False, ""
+
+    @staticmethod
+    def _check_session_limit(output: dict) -> tuple[bool, str]:
+        """stdout JSON 또는 stderr에서 세션 사용 한도 초과 메시지 감지."""
+        needles = ["session limit", "usage limit", "you've hit your"]
+        try:
+            data = json.loads(output.get("stdout", "{}"))
+            result = str(data.get("result", "")).lower()
+            for n in needles:
+                if n in result:
+                    return True, data.get("result", "session limit reached")
+        except (json.JSONDecodeError, TypeError):
+            pass
+        stderr = str(output.get("stderr", "")).lower()
+        for n in needles:
+            if n in stderr:
+                return True, output.get("stderr", "")[:300]
         return False, ""
 
     # --- 엔진 호출 ---
@@ -426,6 +445,22 @@ class StepExecutor:
                 self._update_top_index("blocked")
                 print(f"\n  ⏸ Step {step_num}: rate limited [{elapsed}s]")
                 print(f"    {rate_msg}")
+                print(f"    세션 한도 리셋 후 status를 'pending'으로 바꾸고 재실행하세요.")
+                sys.exit(2)
+
+            # 세션 사용 한도 초과 감지 (재시도 없이 즉시 중단)
+            is_session_limit, limit_msg = self._check_session_limit(output)
+            if is_session_limit:
+                ts = self._stamp()
+                index = self._read_json(self._index_file)
+                for s in index["steps"]:
+                    if s["step"] == step_num:
+                        s["status"] = "blocked"
+                        s["blocked_reason"] = f"session-limit: {limit_msg[:200]}"
+                        s["blocked_at"] = ts
+                self._write_json(self._index_file, index)
+                self._update_top_index("blocked")
+                print(f"\n  ⏸ Step {step_num}: session limit 초과 [{elapsed}s]")
                 print(f"    세션 한도 리셋 후 status를 'pending'으로 바꾸고 재실행하세요.")
                 sys.exit(2)
 

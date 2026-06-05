@@ -31,6 +31,10 @@ export default function NavBar({ email }: NavBarProps) {
     >
       <strong style={{ marginRight: "16px" }}>Costflow</strong>
       <Link href="/">Home</Link>
+      <Link href="/projects">Projects</Link>
+      <Link href="/usage">Usage</Link>
+      <Link href="/sessions">Sessions</Link>
+      <Link href="/prompts">Prompts</Link>
       <Link href="/settings">Settings</Link>
       <span style={{ marginLeft: "auto", color: "#555" }}>{email}</span>
       <button type="button" onClick={() => void handleSignOut()}>
