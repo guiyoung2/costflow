@@ -17,3 +17,4 @@
 - 2026-06-05 · Phase 6: 대시보드 화면 — 6개 API 라우트, /projects, /usage, /sessions, /prompts, Home 실데이터 연결
 - 2026-06-05 · normalize-schema: messages/tool_calls/skill_usages/agent_usages 테이블 생성 + RLS + backfill migration 적용
 - 2026-06-05 · ingestion-update: processEvent에 messages INSERT(⑥) + tool_calls INSERT(⑦) 추가, 빌드/타입체크 통과
+- 2026-06-05 · tool-calls-api: GET /api/tool-calls 신규 + sessions API에 tool_call_count 추가, 빌드/타입체크 통과
