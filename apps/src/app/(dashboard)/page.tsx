@@ -121,12 +121,12 @@ export default function Home() {
             <p className="text-slate-500 text-sm mt-2">
               Settings 페이지에서 API key를 발급한 뒤, CLI로 연결하세요:
             </p>
-            <pre className="mt-3 bg-surface rounded-lg p-3 text-xs text-slate-300 font-mono border border-white/10">
+            <pre className="mt-3 bg-surface rounded-lg p-3 text-xs text-slate-300 font-mono border border-surface-border">
               {`npm install -g costflow\ncostflow init`}
             </pre>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-white/10">
+          <div className="overflow-x-auto rounded-xl border border-surface-border">
             <table className="table-auto w-full text-sm">
               <thead>
                 <tr className="bg-surface-card">
@@ -143,7 +143,7 @@ export default function Home() {
               </thead>
               <tbody>
                 {recentProjects.map((p) => (
-                  <tr key={p.id} className="table-row-hover border-t border-white/5">
+                  <tr key={p.id} className="table-row-hover border-t border-surface-border">
                     <td className="px-4 py-3 text-slate-300">
                       <Link href="/projects" className="text-brand-400 hover:text-brand-300 transition-colors">
                         {p.name}

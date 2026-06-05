@@ -78,40 +78,28 @@ export default function ProjectsPage() {
       ) : projects.length === 0 ? (
         <EmptyState message="연결된 프로젝트가 없습니다." />
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-white/10 mt-5">
+        <div className="card rounded-lg overflow-x-auto mt-5">
           <table className="table-auto w-full text-sm">
             <thead>
-              <tr className="bg-surface-card">
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">
-                  이름
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">
-                  세션 수
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">
-                  마지막 활동
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">
-                  생성일
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">
-                  삭제
-                </th>
+              <tr className="bg-surface-raised">
+                <th className="px-4 py-3 text-left section-label">이름</th>
+                <th className="px-4 py-3 text-left section-label">세션 수</th>
+                <th className="px-4 py-3 text-left section-label">마지막 활동</th>
+                <th className="px-4 py-3 text-left section-label">생성일</th>
+                <th className="px-4 py-3 text-left section-label">삭제</th>
               </tr>
             </thead>
             <tbody>
               {projects.map((project) => (
-                <tr key={project.id} className="table-row-hover border-t border-white/5">
-                  <td className="px-4 py-3 text-white font-semibold">{project.name}</td>
-                  <td className="px-4 py-3 text-slate-400 text-sm tabular-nums">
-                    {project.session_count}
-                  </td>
-                  <td className="px-4 py-3 text-slate-400 text-sm">
+                <tr key={project.id} className="table-row-hover border-t border-surface-border">
+                  <td className="px-4 py-3 text-zinc-100 font-medium">{project.name}</td>
+                  <td className="px-4 py-3 text-zinc-400 tabular-nums">{project.session_count}</td>
+                  <td className="px-4 py-3 text-zinc-400">
                     {project.last_active_at
                       ? new Date(project.last_active_at).toLocaleString()
                       : "—"}
                   </td>
-                  <td className="px-4 py-3 text-slate-400 text-sm">
+                  <td className="px-4 py-3 text-zinc-400">
                     {new Date(project.created_at).toLocaleString()}
                   </td>
                   <td className="px-4 py-3">
@@ -119,7 +107,7 @@ export default function ProjectsPage() {
                       type="button"
                       onClick={() => void handleDelete(project.id)}
                       disabled={deletingIds.has(project.id)}
-                      className="text-slate-600 hover:text-red-400 text-xs px-2 py-1 rounded hover:bg-red-500/10 transition-all"
+                      className="text-zinc-600 hover:text-red-400 text-xs px-2 py-1 rounded hover:bg-surface-raised transition-colors"
                     >
                       {deletingIds.has(project.id) ? "삭제 중..." : "삭제"}
                     </button>

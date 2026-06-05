@@ -17,6 +17,7 @@ type CreateKeyResponse = {
 export default function SettingsPage() {
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [newKeyPlain, setNewKeyPlain] = useState<string | null>(null);
+  const [newKeyId, setNewKeyId] = useState<string | null>(null);
   const [loadingKeys, setLoadingKeys] = useState(true);
   const [creating, setCreating] = useState(false);
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
@@ -70,6 +71,7 @@ export default function SettingsPage() {
       }
 
       setNewKeyPlain(body.plain_key);
+      setNewKeyId(body.id);
       setShowCreateForm(false);
       setNewKeyName("");
       await loadKeys();
@@ -105,6 +107,10 @@ export default function SettingsPage() {
       }
 
       setKeys((current) => current.filter((key) => key.id !== id));
+      if (id === newKeyId) {
+        setNewKeyPlain(null);
+        setNewKeyId(null);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.");
     } finally {
@@ -160,21 +166,21 @@ export default function SettingsPage() {
         ) : keys.length === 0 ? (
           <EmptyState message="발급된 API key가 없습니다." />
         ) : (
-          <div className="divide-y divide-white/10 rounded-xl border border-white/10 overflow-hidden">
+          <div className="card rounded-lg divide-y divide-surface-border overflow-hidden">
             {keys.map((key) => (
               <div
                 key={key.id}
-                className="bg-surface-card px-4 py-3 flex items-center justify-between hover:bg-white/5 transition-colors"
+                className="px-4 py-3 flex items-center justify-between table-row-hover"
               >
                 <div className="flex items-center gap-4 min-w-0 flex-wrap">
-                  <span className="text-slate-200 font-medium text-sm">{key.name}</span>
-                  <span className="font-mono text-xs bg-black/30 border border-white/10 px-2 py-1 rounded text-slate-400">
+                  <span className="text-zinc-200 font-medium text-sm">{key.name}</span>
+                  <span className="font-mono text-xs bg-surface-raised border border-surface-border px-2 py-0.5 rounded text-zinc-400">
                     {key.key_prefix}...
                   </span>
-                  <span className="text-slate-500 text-xs">
+                  <span className="text-zinc-500 text-xs">
                     {new Date(key.created_at).toLocaleString()}
                   </span>
-                  <span className={`text-xs ${key.is_active ? "text-emerald-400" : "text-slate-500"}`}>
+                  <span className={`text-xs ${key.is_active ? "text-emerald-400" : "text-zinc-500"}`}>
                     {key.is_active ? "활성" : "비활성"}
                   </span>
                 </div>
@@ -182,7 +188,7 @@ export default function SettingsPage() {
                   type="button"
                   onClick={() => void handleDeleteKey(key.id)}
                   disabled={deletingIds.has(key.id)}
-                  className="text-slate-600 hover:text-red-400 text-xs px-2 py-1 rounded hover:bg-red-500/10 transition-all shrink-0"
+                  className="text-zinc-600 hover:text-red-400 text-xs px-2 py-1 rounded hover:bg-surface-raised transition-colors shrink-0"
                 >
                   {deletingIds.has(key.id) ? "삭제 중..." : "삭제"}
                 </button>
@@ -192,18 +198,18 @@ export default function SettingsPage() {
         )}
 
         {newKeyPlain ? (
-          <div className="mt-6 bg-surface-card border border-brand-500/30 rounded-xl p-5">
+          <div className="mt-4 card rounded-lg p-4 border-l-2 border-l-amber-500">
             <p className="text-amber-400 text-sm font-medium mb-3">
               이 키는 지금만 볼 수 있습니다. 안전한 곳에 저장하세요.
             </p>
-            <code className="font-mono text-xs bg-black/30 border border-white/10 px-3 py-2 rounded block text-slate-300 break-all">
+            <code className="font-mono text-xs bg-surface-raised border border-surface-border px-3 py-2 rounded block text-zinc-300 break-all">
               {newKeyPlain}
             </code>
             <div className="flex gap-2 items-center mt-3">
               <button
                 type="button"
                 onClick={() => void handleCopyKey()}
-                className="text-brand-400 hover:text-brand-300 text-xs px-2 py-1 rounded hover:bg-brand-500/10 transition-all"
+                className="text-brand-500 hover:text-brand-400 text-xs px-2 py-1 rounded hover:bg-surface-raised transition-colors"
               >
                 복사
               </button>

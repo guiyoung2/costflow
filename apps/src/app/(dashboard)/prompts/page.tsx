@@ -84,7 +84,7 @@ export default function PromptsPage() {
             id="project-filter"
             value={projectFilter}
             onChange={handleFilterChange}
-            className="bg-surface-card border border-white/10 text-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="bg-surface-card border border-surface-border text-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           >
             <option value="">전체</option>
             {projects.map((p) => (
@@ -109,7 +109,7 @@ export default function PromptsPage() {
           {prompts.map((p) => (
             <div
               key={p.id}
-              className="bg-surface-card border border-white/10 rounded-xl p-4 hover:border-brand-500/30 hover:bg-white/5 transition-all duration-200"
+              className="card rounded-lg p-4 hover:bg-surface-raised transition-colors duration-150"
             >
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-slate-500 text-xs">
@@ -118,7 +118,7 @@ export default function PromptsPage() {
                 <span className="text-slate-500 text-xs">·</span>
                 <span className="text-slate-500 text-xs">{p.project_name}</span>
               </div>
-              <div className="font-mono text-sm bg-black/20 border border-white/10 p-3 rounded-lg text-slate-300 overflow-auto">
+              <div className="font-mono text-sm bg-surface-raised border border-surface-border p-3 rounded-lg text-zinc-300 overflow-auto">
                 {renderPromptContent(p.prompt)}
               </div>
             </div>

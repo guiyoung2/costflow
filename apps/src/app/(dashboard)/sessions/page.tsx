@@ -102,7 +102,7 @@ export default function SessionsPage() {
           id="project-filter"
           value={projectFilter}
           onChange={handleFilterChange}
-          className="bg-surface-card border border-white/10 text-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="bg-surface-card border border-surface-border text-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
         >
           <option value="">전체</option>
           {projects.map((p) => (
@@ -122,7 +122,7 @@ export default function SessionsPage() {
       ) : sessions.length === 0 ? (
         <EmptyState message="세션이 없습니다." />
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-white/10 mt-5">
+        <div className="overflow-x-auto rounded-xl border border-surface-border mt-5">
           <table className="table-auto w-full text-sm">
             <thead>
               <tr className="bg-surface-card">
@@ -141,7 +141,7 @@ export default function SessionsPage() {
             </thead>
             <tbody>
               {sessions.map((s) => (
-                <tr key={s.id} className="table-row-hover border-t border-white/5">
+                <tr key={s.id} className="table-row-hover border-t border-surface-border">
                   <td className="px-4 py-3 text-brand-400 font-medium">{s.project_name}</td>
                   <td className="px-4 py-3 text-slate-300">{s.session_id_ext.slice(0, 8)}</td>
                   <td className="px-4 py-3 text-slate-500 text-xs">

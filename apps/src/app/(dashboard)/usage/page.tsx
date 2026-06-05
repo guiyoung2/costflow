@@ -107,7 +107,7 @@ export default function UsagePage() {
       <h1 className="text-2xl font-bold text-white">Usage</h1>
 
       <div className="flex flex-wrap gap-4 items-center">
-        <div className="flex gap-1 bg-surface-card rounded-lg p-1 border border-white/10">
+        <div className="flex gap-1 bg-surface-card rounded-lg p-1 border border-surface-border">
           {DAYS_OPTIONS.map((d) => (
             <button
               key={d}
@@ -127,7 +127,7 @@ export default function UsagePage() {
         <select
           value={projectId}
           onChange={handleProjectChange}
-          className="bg-surface-card border border-white/10 rounded-lg px-3 py-1.5 text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="bg-surface-card border border-surface-border rounded-lg px-3 py-1.5 text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500"
         >
           <option value="">전체 프로젝트</option>
           {projects.map((p) => (
@@ -153,9 +153,9 @@ export default function UsagePage() {
             {totals.output_tokens.toLocaleString()}
           </p>
         </div>
-        <div className="stat-card border-l-2 border-l-purple-500">
+        <div className="stat-card border-l-2 border-l-orange-500">
           <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Cache Creation</p>
-          <p className="text-2xl font-bold text-purple-400 tabular-nums mt-2">
+          <p className="text-2xl font-bold text-orange-400 tabular-nums mt-2">
             {totals.cache_creation_tokens.toLocaleString()}
           </p>
         </div>
@@ -175,7 +175,7 @@ export default function UsagePage() {
             <p>아직 수집된 데이터가 없습니다.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-white/10">
+          <div className="overflow-x-auto rounded-xl border border-surface-border">
             <table className="table-auto w-full text-sm">
               <thead>
                 <tr className="bg-surface-card">
@@ -198,7 +198,7 @@ export default function UsagePage() {
               </thead>
               <tbody>
                 {sortedUsage.map((row) => (
-                  <tr key={row.date} className="table-row-hover border-t border-white/5 text-slate-300">
+                  <tr key={row.date} className="table-row-hover border-t border-surface-border text-slate-300">
                     <td className="px-4 py-3">{row.date}</td>
                     <td className="px-4 py-3 tabular-nums text-right">
                       {row.input_tokens.toLocaleString()}
@@ -229,7 +229,7 @@ export default function UsagePage() {
             <p>수집된 tool 데이터가 없습니다.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-white/10">
+          <div className="overflow-x-auto rounded-xl border border-surface-border">
             <table className="table-auto w-full text-sm">
               <thead>
                 <tr className="bg-surface-card">
@@ -243,7 +243,7 @@ export default function UsagePage() {
               </thead>
               <tbody>
                 {toolStats.map((t) => (
-                  <tr key={t.tool_name} className="table-row-hover border-t border-white/5 text-slate-300">
+                  <tr key={t.tool_name} className="table-row-hover border-t border-surface-border text-slate-300">
                     <td className="px-4 py-3">{t.tool_name}</td>
                     <td className="px-4 py-3 tabular-nums text-right">{t.count.toLocaleString()}</td>
                   </tr>

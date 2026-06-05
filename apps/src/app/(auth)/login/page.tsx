@@ -28,7 +28,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="glass rounded-2xl p-8 w-full max-w-md shadow-card animate-slide-up">
+    <div className="card rounded-xl p-8 w-full max-w-sm animate-slide-up">
       <div className="mb-8 text-center">
         <h1 className="text-2xl font-bold text-white mb-2">Costflow</h1>
         <p className="text-slate-400 text-sm">다시 만나서 반갑습니다. 로그인해주세요.</p>

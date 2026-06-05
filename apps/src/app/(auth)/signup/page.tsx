@@ -35,12 +35,20 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="glass rounded-2xl p-8 w-full max-w-md shadow-card animate-slide-up">
+    <div className="card rounded-xl p-8 w-full max-w-sm animate-slide-up">
       {success ? (
         <div className="text-center py-4">
           <h2 className="text-xl font-semibold text-white mb-2">인증 메일을 발송했습니다</h2>
           <p className="text-slate-400 text-sm">받은편지함을 확인해주세요.</p>
           <p className="text-slate-500 text-xs mt-2">{email}</p>
+          <div className="mt-6">
+            <Link
+              href="/login"
+              className="btn-primary inline-block text-sm"
+            >
+              로그인 페이지로 돌아가기
+            </Link>
+          </div>
         </div>
       ) : (
         <>
