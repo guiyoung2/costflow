@@ -135,4 +135,41 @@ export async function processEvent(
       // swallow
     }
   }
+
+  // ⑥ messages INSERT (UserPromptSubmit only)
+  if (event.hook_type === 'UserPromptSubmit' && eventPayload['prompt'] != null) {
+    try {
+      await supabase.from('messages').upsert(
+        {
+          session_id: sessionId,
+          turn_index: event.turn_index ?? 0,
+          role: 'user',
+          content: eventPayload['prompt'] as string,
+        },
+        { onConflict: 'session_id,turn_index,role', ignoreDuplicates: true },
+      );
+    } catch {
+      // swallow
+    }
+  }
+
+  // ⑦ tool_calls INSERT (Stop + non-empty tool_use_names)
+  if (
+    event.hook_type === 'Stop' &&
+    event.tool_use_names &&
+    event.tool_use_names.length > 0
+  ) {
+    try {
+      await supabase.from('tool_calls').insert(
+        event.tool_use_names.map((toolName) => ({
+          session_id: sessionId,
+          event_id: eventId,
+          turn_index: event.turn_index ?? null,
+          tool_name: toolName,
+        })),
+      );
+    } catch {
+      // swallow
+    }
+  }
 }
