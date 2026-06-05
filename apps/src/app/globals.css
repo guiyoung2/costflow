@@ -44,7 +44,7 @@ html, body {
   .btn-primary {
     @apply bg-brand-600 hover:bg-brand-500 active:bg-brand-700
            text-white font-medium rounded-lg px-4 py-2
-           transition-all duration-200 shadow-glow/50 hover:shadow-glow
+           transition-all duration-200 shadow-glow hover:shadow-glow-lg
            focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 focus:ring-offset-surface;
   }
   .btn-ghost {

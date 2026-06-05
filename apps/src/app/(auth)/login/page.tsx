@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
@@ -27,42 +28,53 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
-      <div style={{ width: "320px" }}>
-        <h1 style={{ marginBottom: "24px", fontSize: "24px", fontWeight: "bold" }}>Costflow 로그인</h1>
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: "16px" }}>
-            <label style={{ display: "block", marginBottom: "4px" }}>이메일</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{ width: "100%", padding: "8px", border: "1px solid #ccc", borderRadius: "4px", boxSizing: "border-box" }}
-            />
-          </div>
-          <div style={{ marginBottom: "16px" }}>
-            <label style={{ display: "block", marginBottom: "4px" }}>비밀번호</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={{ width: "100%", padding: "8px", border: "1px solid #ccc", borderRadius: "4px", boxSizing: "border-box" }}
-            />
-          </div>
-          {error && (
-            <p style={{ color: "red", marginBottom: "16px", fontSize: "14px" }}>{error}</p>
-          )}
-          <button
-            type="submit"
-            disabled={loading}
-            style={{ width: "100%", padding: "10px", background: "#000", color: "#fff", border: "none", borderRadius: "4px", cursor: loading ? "not-allowed" : "pointer" }}
-          >
-            {loading ? "로그인 중..." : "로그인"}
-          </button>
-        </form>
+    <div className="glass rounded-2xl p-8 w-full max-w-md shadow-card animate-slide-up">
+      <div className="mb-8 text-center">
+        <h1 className="text-2xl font-bold text-white mb-2">Costflow</h1>
+        <p className="text-slate-400 text-sm">다시 만나서 반갑습니다. 로그인해주세요.</p>
       </div>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-1.5">이메일</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            placeholder="you@example.com"
+            className="input-field"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-1.5">비밀번호</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            placeholder="••••••••"
+            className="input-field"
+          />
+        </div>
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-sm text-red-400">
+            {error}
+          </div>
+        )}
+        <button
+          type="submit"
+          disabled={loading}
+          className={`btn-primary w-full ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
+        >
+          {loading ? "로그인 중..." : "로그인"}
+        </button>
+      </form>
+      <p className="mt-6 text-center text-sm text-slate-400">
+        계정이 없으신가요?{" "}
+        <Link href="/signup" className="text-brand-400 hover:text-brand-300 font-medium">
+          회원가입
+        </Link>
+      </p>
     </div>
   );
 }
