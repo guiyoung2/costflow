@@ -11,6 +11,36 @@
 - **비차단 신뢰성** — 전송 실패 시 로컬 outbox에 저장 후 재시도, Claude Code 작업을 막지 않음
 - **Codex 연동** — `costflow sync`로 Codex CLI/Desktop 세션 파일도 동일 대시보드에서 조회
 
+## Quick Start
+
+```bash
+# 1. Costflow 서버 로컬 실행
+git clone https://github.com/guiyoung2/costflow.git
+cd costflow && npm install
+cp .env.example apps/.env.local   # Supabase 키 입력
+npm run dev                        # http://localhost:3000
+```
+
+```bash
+# 2. 추적할 Claude Code 프로젝트 연결
+cd /path/to/your-claude-project
+costflow init   # 대시보드 Settings에서 발급한 API key 입력
+git add .claude/settings.json .costflow/project.json
+git commit -m "chore: add costflow tracking"
+```
+
+이후 Claude Code를 평소처럼 사용하면 데이터가 자동으로 대시보드에 수집됩니다.
+
+## 작동 방식
+
+1. `costflow init`을 실행하면 `.claude/settings.json`에 hook이 등록되고, `.costflow/project.json`에 프로젝트 메타데이터가 저장됩니다.
+
+2. Claude Code가 hook을 실행하면 `costflow hook`이 호출됩니다. hook runner는 transcript를 파싱해 토큰·tool·세션 데이터를 추출하고, 프롬프트의 민감정보를 로컬에서 마스킹한 뒤 API로 전송합니다.
+
+3. 전송 실패 시에는 `~/.costflow/outbox.sqlite`에 이벤트를 보관하고 성공 종료합니다. Claude Code 작업을 막지 않으며, 다음 hook 실행 또는 `costflow flush` 시 재전송합니다.
+
+4. 대시보드(`/dashboard`)에서 프로젝트별 토큰 사용량, 세션 타임라인, 마스킹된 프롬프트 내역을 조회합니다.
+
 ## 기술 스택
 
 | 레이어 | 기술 |
@@ -154,22 +184,6 @@ OS 스케줄러(cron / Task Scheduler)에 등록하면 자동 실행됩니다.
 | `/sessions` | 세션 타임라인과 turn 단위 상세 |
 | `/prompts` | 마스킹된 프롬프트 내역 |
 | `/settings` | API key 관리, 마스킹 규칙, 데이터 삭제 |
-
----
-
-## Vercel 배포
-
-1. Vercel에서 이 저장소를 import합니다.
-2. **Root Directory**를 `apps`로 설정합니다.
-3. 환경변수를 추가합니다.
-
-```
-NEXT_PUBLIC_SUPABASE_URL
-NEXT_PUBLIC_SUPABASE_ANON_KEY
-SUPABASE_SERVICE_ROLE_KEY
-```
-
-4. 배포 후 `apps/.env.local`의 URL을 Vercel 도메인으로 업데이트하고 CLI를 재설정합니다.
 
 ---
 
