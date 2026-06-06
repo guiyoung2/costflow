@@ -6,18 +6,18 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          50:  '#eff6ff',
-          100: '#dbeafe',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
+          50:  '#ecfeff',
+          100: '#cffafe',
+          400: '#22d3ee',
+          500: '#06b6d4',
+          600: '#0891b2',
+          700: '#0e7490',
         },
         surface: {
-          DEFAULT: '#09090b',
-          card:    '#111113',
-          raised:  '#1c1c1f',
-          border:  '#27272a',
+          DEFAULT: '#060a0e',
+          card:    '#0d1117',
+          raised:  '#161b22',
+          border:  '#21262d',
         },
       },
       animation: {
