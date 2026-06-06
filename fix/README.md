@@ -28,3 +28,4 @@
 - 2026-06-06 · codex-parser: packages/cli/src/codex/parser.ts 구현 — 실제 샘플 스키마 확인, token_count 누적 델타 계산, 4컬럼 매핑, 단위 테스트 3개 통과
 - 2026-06-06 · sync-command: HookEvent에 agent 필드 추가, sync.ts(mtime+turn 멱등 추적), index.ts sync 서브커맨드 등록, ingestion agent 전달, Supabase agent='codex' 62개 세션 확인, 재실행 tool_calls 불변(1919행) 확인
 - 2026-06-06 · ingestion-agent: ingestion/index.ts session insert에 agent: event.agent ?? 'claude' 명시적 기본값 추가, typecheck/build 통과
+- 2026-06-06 · dashboard-filter: Session 타입 agent 추가, /api/usage·sessions·tool-calls에 agent 쿼리 파라미터 필터, usage·sessions 페이지에 Claude Code/Codex/전체 세그먼트 버튼그룹, sessions 행에 CC/Codex 배지, typecheck/build 통과

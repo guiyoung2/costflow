@@ -15,6 +15,7 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const projectId = searchParams.get("project_id");
+  const agent = searchParams.get("agent");
 
   let query = supabase
     .from("sessions")
@@ -24,6 +25,9 @@ export async function GET(request: Request) {
 
   if (projectId) {
     query = query.eq("project_id", projectId);
+  }
+  if (agent) {
+    query = query.eq("agent", agent);
   }
 
   const { data: sessions, error: sessionsError } = await query;
@@ -108,6 +112,7 @@ export async function GET(request: Request) {
       total_cache_creation_tokens: agg.cache_creation,
       total_cache_read_tokens: agg.cache_read,
       tool_call_count: toolCountMap.get(s.id) ?? 0,
+      agent: (s.agent as string) ?? "claude",
     };
   });
 

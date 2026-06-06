@@ -15,6 +15,7 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const projectId = searchParams.get("project_id");
+  const agent = searchParams.get("agent");
   const daysParam = searchParams.get("days");
   const days = daysParam ? parseInt(daysParam, 10) : 30;
 
@@ -29,11 +30,12 @@ export async function GET(request: Request) {
     cache_read_tokens: number;
   }> = [];
 
-  if (projectId) {
-    const { data: sessions, error: sessionsError } = await supabase
-      .from("sessions")
-      .select("id")
-      .eq("project_id", projectId);
+  if (projectId || agent) {
+    let sessionQuery = supabase.from("sessions").select("id");
+    if (projectId) sessionQuery = sessionQuery.eq("project_id", projectId);
+    if (agent) sessionQuery = sessionQuery.eq("agent", agent);
+
+    const { data: sessions, error: sessionsError } = await sessionQuery;
 
     if (sessionsError) {
       return NextResponse.json({ error: sessionsError.message }, { status: 500 });

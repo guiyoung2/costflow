@@ -7,19 +7,32 @@ import TableSkeleton from "@/components/TableSkeleton";
 import type { Project } from "@/types/project";
 import type { Session } from "@/types/session";
 
+type AgentFilter = "claude" | "codex" | null;
+
+const AGENT_OPTIONS: { label: string; value: AgentFilter }[] = [
+  { label: "전체", value: null },
+  { label: "Claude Code", value: "claude" },
+  { label: "Codex", value: "codex" },
+];
+
 export default function SessionsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [projectFilter, setProjectFilter] = useState<string>("");
+  const [agentFilter, setAgentFilter] = useState<AgentFilter>(null);
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
 
-  async function loadSessions(pid?: string) {
+  async function loadSessions(pid?: string, agent?: AgentFilter) {
     setLoading(true);
     setError(null);
     try {
-      const url = pid ? `/api/sessions?project_id=${pid}` : "/api/sessions";
+      const params = new URLSearchParams();
+      if (pid) params.set("project_id", pid);
+      if (agent) params.set("agent", agent);
+      const qs = params.toString();
+      const url = qs ? `/api/sessions?${qs}` : "/api/sessions";
       const response = await fetch(url);
       const body = (await response.json()) as { sessions?: Session[]; error?: string };
       if (!response.ok) {
@@ -60,7 +73,12 @@ export default function SessionsPage() {
   function handleFilterChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const pid = e.target.value;
     setProjectFilter(pid);
-    void loadSessions(pid || undefined);
+    void loadSessions(pid || undefined, agentFilter);
+  }
+
+  function handleAgentChange(nextAgent: AgentFilter) {
+    setAgentFilter(nextAgent);
+    void loadSessions(projectFilter || undefined, nextAgent);
   }
 
   async function handleDelete(id: string) {
@@ -94,7 +112,7 @@ export default function SessionsPage() {
     <main className="max-w-[1200px] mx-auto py-10 px-6">
       <h1 className="text-2xl font-bold text-slate-100">Sessions</h1>
 
-      <div className="mt-4 flex items-center gap-2">
+      <div className="mt-4 flex flex-wrap items-center gap-4">
         <label htmlFor="project-filter" className="text-sm text-slate-400">
           프로젝트:
         </label>
@@ -111,13 +129,30 @@ export default function SessionsPage() {
             </option>
           ))}
         </select>
+
+        <div className="flex gap-1 bg-surface-card rounded-lg p-1 border border-surface-border">
+          {AGENT_OPTIONS.map((opt) => (
+            <button
+              key={opt.value ?? "all"}
+              type="button"
+              onClick={() => handleAgentChange(opt.value)}
+              className={
+                agentFilter === opt.value
+                  ? "bg-brand-600 text-white rounded-md px-4 py-1.5 text-sm font-medium transition-all"
+                  : "text-slate-400 hover:text-white px-4 py-1.5 text-sm rounded-md transition-colors"
+              }
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {error ? <p className="text-red-400 mt-3 text-sm">{error}</p> : null}
 
       {loading ? (
         <div className="mt-5">
-          <TableSkeleton rows={5} cols={11} />
+          <TableSkeleton rows={5} cols={12} />
         </div>
       ) : sessions.length === 0 ? (
         <EmptyState message="세션이 없습니다." />
@@ -127,6 +162,7 @@ export default function SessionsPage() {
             <thead>
               <tr className="bg-surface-card">
                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">프로젝트</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Agent</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Session ID</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">시작 시간</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">종료 시간</th>
@@ -143,6 +179,11 @@ export default function SessionsPage() {
               {sessions.map((s) => (
                 <tr key={s.id} className="table-row-hover border-t border-surface-border">
                   <td className="px-4 py-3 text-brand-400 font-medium">{s.project_name}</td>
+                  <td className="px-4 py-3">
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-surface-raised text-zinc-400 border border-surface-border">
+                      {s.agent === "codex" ? "Codex" : "CC"}
+                    </span>
+                  </td>
                   <td className="px-4 py-3 text-slate-300">{s.session_id_ext.slice(0, 8)}</td>
                   <td className="px-4 py-3 text-slate-500 text-xs">
                     {s.started_at ? new Date(s.started_at).toLocaleString() : "-"}
