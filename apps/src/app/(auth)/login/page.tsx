@@ -24,7 +24,7 @@ export default function LoginPage() {
       return;
     }
 
-    window.location.href = "/auth/callback?next=/";
+    window.location.href = "/auth/callback?next=/dashboard";
   }
 
   return (

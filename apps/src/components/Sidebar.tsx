@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 const navItems = [
-  { href: "/", label: "Home", icon: "⬡" },
+  { href: "/dashboard", label: "Home", icon: "⬡" },
   { href: "/usage", label: "Usage", icon: "◈" },
   { href: "/sessions", label: "Sessions", icon: "◇" },
   { href: "/prompts", label: "Prompts", icon: "◉" },
@@ -20,7 +20,7 @@ const ACTIVE_ITEM =
   "text-zinc-100 bg-surface-raised border-l-2 border-l-brand-500 pl-[10px]";
 
 function isActive(pathname: string, href: string) {
-  if (href === "/") return pathname === "/";
+  if (href === "/dashboard") return pathname === "/dashboard";
   return pathname.startsWith(href);
 }
 
