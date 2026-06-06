@@ -27,3 +27,4 @@
 - 2026-06-06 · schema-agent: sessions.agent 컬럼 추가(006_codex_agent.sql), CHECK(claude|codex), 기본값 claude, NULL 행 없음, typecheck/build 통과
 - 2026-06-06 · codex-parser: packages/cli/src/codex/parser.ts 구현 — 실제 샘플 스키마 확인, token_count 누적 델타 계산, 4컬럼 매핑, 단위 테스트 3개 통과
 - 2026-06-06 · sync-command: HookEvent에 agent 필드 추가, sync.ts(mtime+turn 멱등 추적), index.ts sync 서브커맨드 등록, ingestion agent 전달, Supabase agent='codex' 62개 세션 확인, 재실행 tool_calls 불변(1919행) 확인
+- 2026-06-06 · ingestion-agent: ingestion/index.ts session insert에 agent: event.agent ?? 'claude' 명시적 기본값 추가, typecheck/build 통과
