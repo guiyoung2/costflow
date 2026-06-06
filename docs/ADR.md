@@ -48,3 +48,10 @@
 - **결정**: DB에 hash 저장 (평문 금지), 발급 시 1회만 평문 노출
 - **이유**: 보안 — DB 유출 시 평문 key 노출 방지
 - **로컬 저장**: Phase 4에서 결정 (로컬 config 파일 우선, 이후 OS keychain 검토)
+
+## Codex 연동: 파일 스캔 + 4컬럼 토큰 매핑
+
+- **결정**: hook 방식 대신 파일 스캔(폴링)으로 Codex 사용량 수집
+- **이유**: Codex Desktop hook 불안정성, CLI·Desktop 모두 `~/.codex/sessions` JSONL을 공유함
+- **토큰 매핑**: `input_tokens`→`input_tokens`, `cached_input_tokens`→`cache_read_tokens`, `output_tokens+reasoning_output_tokens`→`output_tokens`, `cache_creation_tokens`=0
+- **Codex Cloud(웹)**: 로컬 기록이 없어 범위 제외
