@@ -59,8 +59,8 @@ export async function processEvent(
         project_id: projectId,
         session_id_ext: event.session_id,
         started_at: event.timestamp,
+        agent: event.agent ?? 'claude',
       };
-      if (event.agent) sessionInsert['agent'] = event.agent;
       const { data: inserted, error } = await supabase
         .from('sessions')
         .insert(sessionInsert)
