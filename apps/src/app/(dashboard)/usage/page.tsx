@@ -8,6 +8,13 @@ import type { DailyUsage } from "@/types/usage";
 
 const DAYS_OPTIONS = [7, 30, 90] as const;
 type DaysOption = (typeof DAYS_OPTIONS)[number];
+type AgentFilter = "claude" | "codex" | null;
+
+const AGENT_OPTIONS: { label: string; value: AgentFilter }[] = [
+  { label: "전체", value: null },
+  { label: "Claude Code", value: "claude" },
+  { label: "Codex", value: "codex" },
+];
 
 export default function UsagePage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -15,6 +22,7 @@ export default function UsagePage() {
   const [toolStats, setToolStats] = useState<ToolCallStat[]>([]);
   const [days, setDays] = useState<DaysOption>(30);
   const [projectId, setProjectId] = useState<string>("");
+  const [agentFilter, setAgentFilter] = useState<AgentFilter>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,12 +61,13 @@ export default function UsagePage() {
     void init();
   }, []);
 
-  async function fetchUsage(nextDays: DaysOption, nextProjectId: string) {
+  async function fetchUsage(nextDays: DaysOption, nextProjectId: string, nextAgent: AgentFilter) {
     setLoading(true);
     setError(null);
     try {
       const params = new URLSearchParams({ days: String(nextDays) });
       if (nextProjectId) params.set("project_id", nextProjectId);
+      if (nextAgent) params.set("agent", nextAgent);
       const [res, toolRes] = await Promise.all([
         fetch(`/api/usage?${params.toString()}`),
         fetch(`/api/tool-calls?${params.toString()}`).catch(() => null),
@@ -81,13 +90,18 @@ export default function UsagePage() {
 
   function handleDaysChange(nextDays: DaysOption) {
     setDays(nextDays);
-    void fetchUsage(nextDays, projectId);
+    void fetchUsage(nextDays, projectId, agentFilter);
   }
 
   function handleProjectChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const nextProjectId = e.target.value;
     setProjectId(nextProjectId);
-    void fetchUsage(days, nextProjectId);
+    void fetchUsage(days, nextProjectId, agentFilter);
+  }
+
+  function handleAgentChange(nextAgent: AgentFilter) {
+    setAgentFilter(nextAgent);
+    void fetchUsage(days, projectId, nextAgent);
   }
 
   const sortedUsage = [...usage].sort((a, b) => b.date.localeCompare(a.date));
@@ -120,6 +134,23 @@ export default function UsagePage() {
               }
             >
               {d}일
+            </button>
+          ))}
+        </div>
+
+        <div className="flex gap-1 bg-surface-card rounded-lg p-1 border border-surface-border">
+          {AGENT_OPTIONS.map((opt) => (
+            <button
+              key={opt.value ?? "all"}
+              type="button"
+              onClick={() => handleAgentChange(opt.value)}
+              className={
+                agentFilter === opt.value
+                  ? "bg-brand-600 text-white rounded-md px-4 py-1.5 text-sm font-medium transition-all"
+                  : "text-slate-400 hover:text-white px-4 py-1.5 text-sm rounded-md transition-colors"
+              }
+            >
+              {opt.label}
             </button>
           ))}
         </div>

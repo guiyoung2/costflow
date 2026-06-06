@@ -14,6 +14,7 @@ export interface HookEvent {
   token_usage?: TokenUsage;
   model?: string;
   tool_use_names?: string[];
+  agent?: 'claude' | 'codex';
 }
 
 type SendEventInput = Omit<HookEvent, 'project_name'>;

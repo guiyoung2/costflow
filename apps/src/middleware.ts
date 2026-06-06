@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PROTECTED_PATHS = ["/", "/projects", "/usage", "/sessions", "/settings"];
+const PROTECTED_PATHS = ["/dashboard", "/projects", "/usage", "/sessions", "/settings"];
 
 function isProtectedPath(pathname: string): boolean {
   return PROTECTED_PATHS.some(
@@ -47,7 +47,7 @@ export async function middleware(request: NextRequest) {
 
   if (user && pathname === "/login") {
     const url = request.nextUrl.clone();
-    url.pathname = "/";
+    url.pathname = "/dashboard";
     return NextResponse.redirect(url);
   }
 

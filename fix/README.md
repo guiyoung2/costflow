@@ -24,3 +24,9 @@
 - 2026-06-06 · layout-nav: Sidebar.tsx 클라이언트 컴포넌트 생성(usePathname 활성 하이라이트, 로그아웃), (dashboard)/layout.tsx 사이드바 레이아웃으로 교체, NavBar.tsx 삭제, build/typecheck 통과
 - 2026-06-06 · home-usage: (dashboard)/page.tsx + usage/page.tsx 인라인 스타일 전면 Tailwind 교체, 4색 stat-card 그리드, 기간 필터 버튼그룹, 일별 테이블, Tool 섹션, 빈 상태, build/typecheck 통과
 - 2026-06-06 · sessions-prompts: sessions/page.tsx 인라인 스타일 → Tailwind(글래스 테이블+table-row-hover+tabular-nums+삭제 버튼), prompts/page.tsx 인라인 스타일 → Tailwind(sticky 필터+카드 리스트+mono 프롬프트+빈 상태), build/typecheck 통과
+- 2026-06-06 · schema-agent: sessions.agent 컬럼 추가(006_codex_agent.sql), CHECK(claude|codex), 기본값 claude, NULL 행 없음, typecheck/build 통과
+- 2026-06-06 · codex-parser: packages/cli/src/codex/parser.ts 구현 — 실제 샘플 스키마 확인, token_count 누적 델타 계산, 4컬럼 매핑, 단위 테스트 3개 통과
+- 2026-06-06 · sync-command: HookEvent에 agent 필드 추가, sync.ts(mtime+turn 멱등 추적), index.ts sync 서브커맨드 등록, ingestion agent 전달, Supabase agent='codex' 62개 세션 확인, 재실행 tool_calls 불변(1919행) 확인
+- 2026-06-06 · ingestion-agent: ingestion/index.ts session insert에 agent: event.agent ?? 'claude' 명시적 기본값 추가, typecheck/build 통과
+- 2026-06-06 · dashboard-filter: Session 타입 agent 추가, /api/usage·sessions·tool-calls에 agent 쿼리 파라미터 필터, usage·sessions 페이지에 Claude Code/Codex/전체 세그먼트 버튼그룹, sessions 행에 CC/Codex 배지, typecheck/build 통과
+- 2026-06-06 · Phase 9: Codex CLI/Desktop 파일 스캔 연동 — sessions.agent 컬럼, costflow sync 명령, Windows/macOS 스케줄러, 대시보드 Claude Code/Codex 프로젝트 필터

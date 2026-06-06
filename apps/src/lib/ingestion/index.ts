@@ -55,13 +55,15 @@ export async function processEvent(
         await supabase.from('sessions').update({ ended_at: event.timestamp }).eq('id', sessionId);
       }
     } else {
+      const sessionInsert: Record<string, unknown> = {
+        project_id: projectId,
+        session_id_ext: event.session_id,
+        started_at: event.timestamp,
+        agent: event.agent ?? 'claude',
+      };
       const { data: inserted, error } = await supabase
         .from('sessions')
-        .insert({
-          project_id: projectId,
-          session_id_ext: event.session_id,
-          started_at: event.timestamp,
-        })
+        .insert(sessionInsert)
         .select('id')
         .single();
       if (error || !inserted) return;

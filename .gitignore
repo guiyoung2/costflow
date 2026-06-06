@@ -13,3 +13,6 @@ phases/
 __pycache__/
 *.pyc
 ~/.costflow/
+
+# Superpowers brainstorm temp files
+.superpowers/

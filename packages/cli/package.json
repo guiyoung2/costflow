@@ -10,7 +10,8 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "start": "node dist/index.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "tsc && node --test dist/codex/parser.test.js"
   },
   "dependencies": {
     "better-sqlite3": "^9"
