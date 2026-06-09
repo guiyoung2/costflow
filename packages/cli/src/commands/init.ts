@@ -3,7 +3,7 @@ import * as tty from 'tty';
 import * as fs from 'fs';
 import * as path from 'path';
 import { writeConfig } from '../config';
-import { addCostflowHooks } from '../settings';
+import { addCostflowHooks, addCodexHooks } from '../settings';
 
 function promptSecret(question: string): Promise<string> {
   return new Promise((resolve) => {
@@ -66,6 +66,19 @@ export async function runInit(): Promise<void> {
   );
 
   addCostflowHooks(path.join(process.cwd(), '.claude', 'settings.json'));
+
+  const codexAnswer = await promptLine(
+    'Codex hook도 등록할까요? (Codex v0.114+ 필요) [y/N]: ',
+    'N'
+  );
+  if (codexAnswer.toLowerCase() === 'y') {
+    addCodexHooks(path.join(process.cwd(), '.codex', 'hooks.json'));
+    console.log('Codex hook 등록 완료.');
+    console.log('  → Codex를 열고 /hooks 메뉴에서 costflow를 trust 해주세요.');
+    if (process.platform === 'win32') {
+      console.log('  ⚠ Windows에서 Codex hook은 실험적 기능입니다.');
+    }
+  }
 
   console.log('Costflow initialized successfully.');
 }

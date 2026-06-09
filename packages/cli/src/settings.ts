@@ -7,6 +7,7 @@ const HOOK_EVENTS = ["UserPromptSubmit", "Stop", "SessionEnd", "PreCompact"] as 
 interface HookEntry {
   type: string;
   command: string;
+  commandWindows?: string;
 }
 
 interface HookGroup {
@@ -80,5 +81,59 @@ export function hasCostflowHooks(settingsPath: string): boolean {
   return HOOK_EVENTS.some(event => {
     const groups = settings.hooks?.[event];
     return groups?.some(g => g.hooks.some(h => h.command === COSTFLOW_HOOK_COMMAND)) ?? false;
+  });
+}
+
+const CODEX_HOOK_COMMAND = "costflow hook --agent codex";
+const CODEX_HOOK_EVENTS = ["Stop", "UserPromptSubmit"] as const;
+
+export function addCodexHooks(hooksJsonPath: string): void {
+  const settings = readSettings(hooksJsonPath);
+  if (!settings.hooks) settings.hooks = {};
+
+  for (const event of CODEX_HOOK_EVENTS) {
+    const groups: HookGroup[] = settings.hooks[event] ?? [];
+    const alreadyExists = groups.some(g =>
+      g.hooks.some(h => h.command === CODEX_HOOK_COMMAND)
+    );
+    if (!alreadyExists) {
+      groups.push({ hooks: [{ type: "command", command: CODEX_HOOK_COMMAND, commandWindows: CODEX_HOOK_COMMAND }] });
+    }
+    settings.hooks[event] = groups;
+  }
+
+  writeSettings(hooksJsonPath, settings);
+}
+
+export function removeCodexHooks(hooksJsonPath: string): void {
+  if (!fs.existsSync(hooksJsonPath)) return;
+  const settings = readSettings(hooksJsonPath);
+  if (!settings.hooks) return;
+
+  for (const event of CODEX_HOOK_EVENTS) {
+    const groups = settings.hooks[event];
+    if (!groups) continue;
+
+    const filtered = groups
+      .map(g => ({ ...g, hooks: g.hooks.filter(h => h.command !== CODEX_HOOK_COMMAND) }))
+      .filter(g => g.hooks.length > 0);
+
+    if (filtered.length === 0) {
+      delete settings.hooks[event];
+    } else {
+      settings.hooks[event] = filtered;
+    }
+  }
+
+  writeSettings(hooksJsonPath, settings);
+}
+
+export function hasCodexHooks(hooksJsonPath: string): boolean {
+  const settings = readSettings(hooksJsonPath);
+  if (!settings.hooks) return false;
+
+  return CODEX_HOOK_EVENTS.some(event => {
+    const groups = settings.hooks?.[event];
+    return groups?.some(g => g.hooks.some(h => h.command === CODEX_HOOK_COMMAND)) ?? false;
   });
 }
