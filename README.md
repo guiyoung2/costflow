@@ -108,52 +108,6 @@ OS 스케줄러(cron / Task Scheduler)에 등록하면 자동 실행됩니다.
 
 ---
 
-## 개발자용 (로컬 실행)
-
-저장소를 직접 실행하거나 기여하려는 경우:
-
-### 사전 준비
-
-- Node.js 18 이상
-- [Supabase](https://supabase.com) 프로젝트 (무료 플랜 가능)
-
-### 로컬 실행
-
-```bash
-git clone https://github.com/guiyoung2/costflow.git
-cd costflow
-npm install
-cp .env.example apps/.env.local   # Supabase 키 입력
-npm run dev                        # http://localhost:3000
-```
-
-### 환경변수
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://<project-id>.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key>
-SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
-```
-
-### Supabase 마이그레이션 적용
-
-```bash
-supabase db push
-```
-
-### 개발 명령어
-
-```bash
-npm run dev          # 웹 개발 서버
-npm run build        # 전체 빌드 (웹 + CLI)
-npm run build:web    # 웹만 빌드
-npm run build:cli    # CLI만 빌드
-npm run lint         # ESLint
-npm run typecheck    # TypeScript 타입 검사
-```
-
----
-
 ## 라이선스
 
 MIT
