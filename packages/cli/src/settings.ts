@@ -43,7 +43,7 @@ export function addCostflowHooks(settingsPath: string): void {
       g.hooks.some(h => h.command === COSTFLOW_HOOK_COMMAND)
     );
     if (!alreadyExists) {
-      groups.push({ hooks: [{ type: "command", command: COSTFLOW_HOOK_COMMAND }] });
+      groups.push({ hooks: [{ type: "command", command: COSTFLOW_HOOK_COMMAND, commandWindows: COSTFLOW_HOOK_COMMAND }] });
     }
     settings.hooks[event] = groups;
   }
