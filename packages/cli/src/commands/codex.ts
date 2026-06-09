@@ -7,11 +7,26 @@ const TASK_NAME = 'CostflowSync';
 const PLIST_ID = 'com.costflow.sync';
 const PLIST_PATH = path.join(os.homedir(), 'Library', 'LaunchAgents', `${PLIST_ID}.plist`);
 
+const VBS_RUNNER_PATH = path.join(os.homedir(), '.costflow', 'sync-runner.vbs');
+
 function registerWindows(intervalMinutes: number): void {
-  const tr = `"${process.execPath}" "${process.argv[1]}" sync`;
+  const nodePath = process.execPath;
+  const scriptPath = process.argv[1];
+  const workingDir = process.cwd();
+
+  // VBScript 래퍼: 창 완전 숨김(0) + WorkingDirectory 설정
+  const vbs = [
+    `Set oShell = CreateObject("WScript.Shell")`,
+    `oShell.CurrentDirectory = "${workingDir}"`,
+    `oShell.Run """${nodePath}"" ""${scriptPath}"" sync", 0, False`,
+  ].join('\r\n');
+
+  fs.mkdirSync(path.dirname(VBS_RUNNER_PATH), { recursive: true });
+  fs.writeFileSync(VBS_RUNNER_PATH, vbs, 'utf-8');
+
   const result = spawnSync(
     'schtasks',
-    ['/create', '/tn', TASK_NAME, '/tr', tr, '/sc', 'minute', '/mo', String(intervalMinutes), '/f'],
+    ['/create', '/tn', TASK_NAME, '/tr', `wscript.exe "${VBS_RUNNER_PATH}"`, '/sc', 'minute', '/mo', String(intervalMinutes), '/f'],
     { stdio: 'inherit' }
   );
   if (result.status !== 0) {
@@ -24,6 +39,9 @@ function unregisterWindows(): void {
   const result = spawnSync('schtasks', ['/delete', '/tn', TASK_NAME, '/f'], { stdio: 'inherit' });
   if (result.status !== 0) {
     throw new Error('schtasks 해제 실패');
+  }
+  if (fs.existsSync(VBS_RUNNER_PATH)) {
+    fs.unlinkSync(VBS_RUNNER_PATH);
   }
   console.log('스케줄러 해제됨');
 }
