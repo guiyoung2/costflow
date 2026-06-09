@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import { readConfig, configPath } from '../config';
-import { hasCostflowHooks } from '../settings';
+import { hasCostflowHooks, hasCodexHooks } from '../settings';
 
 interface ProjectJson {
   project_name: string;
@@ -34,4 +34,8 @@ export function runStatus(): void {
 
   const hooksOk = hasCostflowHooks(settingsPath);
   console.log(`Hooks:   ${hooksOk ? 'registered' : 'not registered'}`);
+
+  const codexHooksPath = path.join(process.cwd(), '.codex', 'hooks.json');
+  const codexHooksOk = hasCodexHooks(codexHooksPath);
+  console.log(`Codex hooks: ${codexHooksOk ? 'registered' : 'not registered'}`);
 }

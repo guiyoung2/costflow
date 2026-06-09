@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { removeCostflowHooks } from '../settings';
+import { removeCostflowHooks, removeCodexHooks } from '../settings';
 
 export function runUninstall(): void {
   const settingsPath = path.join(process.cwd(), '.claude', 'settings.json');
@@ -8,6 +8,12 @@ export function runUninstall(): void {
 
   removeCostflowHooks(settingsPath);
   console.log('Removed Costflow hooks from .claude/settings.json');
+
+  const codexHooksPath = path.join(process.cwd(), '.codex', 'hooks.json');
+  if (fs.existsSync(codexHooksPath)) {
+    removeCodexHooks(codexHooksPath);
+    console.log('Removed Costflow hooks from .codex/hooks.json');
+  }
 
   if (fs.existsSync(projectJsonPath)) {
     fs.unlinkSync(projectJsonPath);

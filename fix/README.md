@@ -32,3 +32,4 @@
 - 2026-06-06 · Phase 9: Codex CLI/Desktop 파일 스캔 연동 — sessions.agent 컬럼, costflow sync 명령, Windows/macOS 스케줄러, 대시보드 Claude Code/Codex 프로젝트 필터
 - 2026-06-09 · codex-hook-settings-init: settings.ts에 addCodexHooks/removeCodexHooks/hasCodexHooks 추가, init.ts에 Codex hook 등록 질문 분기 추가, build/typecheck 통과
 - 2026-06-09 · transcript-fix-codex-branch-dedup: turn_index 0-based 수정, transcript.test.ts 4개 테스트, hook.ts --agent 플래그, 007 마이그레이션(UNIQUE 제약), ingestion upsert+ignoreDuplicates
+- 2026-06-10 · uninstall-status-codex: uninstall.ts에 removeCodexHooks 호출(.codex/hooks.json 존재 시), status.ts에 'Codex hooks: registered/not registered' 출력 추가
