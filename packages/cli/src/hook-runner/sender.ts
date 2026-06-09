@@ -48,7 +48,8 @@ export async function sendEvent(event: SendEventInput): Promise<void> {
     const timer = setTimeout(() => controller.abort(), 5000);
 
     try {
-      const res = await fetch(`${config.base_url}/api/events`, {
+      const base = config.base_url.replace(/\/$/, '');
+      const res = await fetch(`${base}/api/events`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
