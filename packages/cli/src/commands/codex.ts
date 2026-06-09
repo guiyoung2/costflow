@@ -38,12 +38,14 @@ function registerWindows(intervalMinutes: number): void {
 function unregisterWindows(): void {
   const result = spawnSync('schtasks', ['/delete', '/tn', TASK_NAME, '/f'], { stdio: 'inherit' });
   if (result.status !== 0) {
-    throw new Error('schtasks 해제 실패');
+    // 작업이 없으면 이미 해제된 상태 — 에러 없이 계속
+    console.log('스케줄러가 등록되어 있지 않습니다.');
+  } else {
+    if (fs.existsSync(VBS_RUNNER_PATH)) {
+      fs.unlinkSync(VBS_RUNNER_PATH);
+    }
+    console.log('스케줄러 해제됨');
   }
-  if (fs.existsSync(VBS_RUNNER_PATH)) {
-    fs.unlinkSync(VBS_RUNNER_PATH);
-  }
-  console.log('스케줄러 해제됨');
 }
 
 function registerMacOS(intervalMinutes: number): void {
