@@ -1,5 +1,5 @@
 {
-  "name": "@guiyoung2/costflow",
+  "name": "costflow-ai",
   "version": "0.1.0",
   "bin": {
     "costflow": "./dist/index.js"

@@ -15,7 +15,7 @@
 
 ```bash
 # 1. CLI 전역 설치 (한 번만)
-npm install -g @guiyoung2/costflow
+npm install -g costflow-ai
 ```
 
 ```bash
@@ -48,7 +48,7 @@ costflow init
 | 언어 | TypeScript strict |
 | 인증 / DB | Supabase Auth + Postgres + RLS |
 | 배포 | Vercel (https://costflow-seven.vercel.app) |
-| CLI | Node.js + TypeScript (`@guiyoung2/costflow`) |
+| CLI | Node.js + TypeScript (`costflow-ai`) |
 | 로컬 outbox | better-sqlite3 |
 | 패키지 매니저 | npm workspaces |
 
