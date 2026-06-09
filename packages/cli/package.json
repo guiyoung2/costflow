@@ -1,7 +1,6 @@
 {
-  "name": "@costflow/cli",
+  "name": "@guiyoung2/costflow",
   "version": "0.1.0",
-  "private": true,
   "bin": {
     "costflow": "./dist/index.js"
   },
