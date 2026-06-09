@@ -12,7 +12,7 @@ const VBS_RUNNER_PATH = path.join(os.homedir(), '.costflow', 'sync-runner.vbs');
 function registerWindows(intervalMinutes: number): void {
   const nodePath = process.execPath;
   const scriptPath = process.argv[1];
-  const workingDir = process.cwd();
+  const workingDir = os.homedir();
 
   // VBScript 래퍼: 창 완전 숨김(0) + WorkingDirectory 설정
   const vbs = [

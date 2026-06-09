@@ -36,3 +36,5 @@
 - 2026-06-10 · Phase 10: Codex Hook 자동화 완료 — costflow init Codex hook 등록, turn_index 0-based 통일, tool_calls UNIQUE+ignoreDuplicates, uninstall/status Codex 지원
 - 2026-06-10 · fix(codex): hasCodexHooks() 절대경로 인식 버그 수정, init에서 Codex 선택 시 sync 스케줄러 자동 등록
 - 2026-06-10 · fix(prompts): 프롬프트 기본 저장 모드 'redacted'→'raw' 변경, Settings에 저장 모드 UI + /api/prompt-storage GET/PATCH 추가
+- 2026-06-10 · fix(cli): Codex hook 중복 등록 방지(절대경로 hook 인식 버그), flush 첫 번째 실패 시 HTTP 상태 코드 출력 추가
+- 2026-06-10 · fix(scheduler): VBScript 래퍼로 Windows 스케줄러 창 깜빡임 제거, cwd system32 고정 문제 해결
