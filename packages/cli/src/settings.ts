@@ -95,11 +95,16 @@ export function addCodexHooks(hooksJsonPath: string): void {
   const settings = readSettings(hooksJsonPath);
   if (!settings.hooks) settings.hooks = {};
 
+  // Windows에서 PATH에 costflow가 없는 경우를 위해 절대경로로 등록
+  const commandWindows = process.platform === 'win32'
+    ? `"${process.execPath}" "${process.argv[1]}" hook --agent codex`
+    : CODEX_HOOK_COMMAND;
+
   for (const event of CODEX_HOOK_EVENTS) {
     const groups: HookGroup[] = settings.hooks[event] ?? [];
     const alreadyExists = groups.some(g => g.hooks.some(isCodexHook));
     if (!alreadyExists) {
-      groups.push({ hooks: [{ type: "command", command: CODEX_HOOK_COMMAND, commandWindows: CODEX_HOOK_COMMAND }] });
+      groups.push({ hooks: [{ type: "command", command: CODEX_HOOK_COMMAND, commandWindows }] });
     }
     settings.hooks[event] = groups;
   }
