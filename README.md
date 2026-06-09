@@ -9,7 +9,7 @@
 - **세션 타임라인** — 세션별·프로젝트별 사용 패턴 조회
 - **프롬프트 마스킹** — API key, secret 등 민감정보를 로컬에서 마스킹 후 전송 (기본 `redacted` 모드)
 - **비차단 신뢰성** — 전송 실패 시 로컬 outbox에 저장 후 재시도, Claude Code 작업을 막지 않음
-- **Codex 연동** — `costflow sync`로 Codex CLI/Desktop 세션 파일도 동일 대시보드에서 조회
+- **Codex 연동** — Codex hook 종료 시점에 세션 파일을 동기화해 CLI/Desktop 사용량도 동일 대시보드에서 조회
 
 ## Quick Start
 
@@ -37,7 +37,7 @@ costflow init
 
 2. Codex hook은 첫 실행 시 신뢰 승인이 필요합니다. Codex에서 `/hooks` 메뉴를 열고 `costflow trust`를 선택하세요.
 
-3. Claude Code / Codex가 hook을 실행하면 `costflow hook`이 호출됩니다. hook runner는 transcript를 파싱해 토큰·tool·세션 데이터를 추출하고, 프롬프트의 민감정보를 로컬에서 마스킹한 뒤 API로 전송합니다.
+3. Claude Code가 hook을 실행하면 `costflow hook`이 transcript를 파싱해 토큰·tool·세션 데이터를 전송합니다. Codex hook은 대화 종료 시점에 `~/.codex/sessions` 파일을 스캔하는 `costflow sync` 경로를 실행해 토큰 포함 turn을 전송합니다.
 
 4. 전송 실패 시에는 `~/.costflow/outbox.sqlite`에 이벤트를 보관하고 성공 종료합니다. 에디터 작업을 막지 않으며, 다음 hook 실행 또는 `costflow flush` 시 재전송합니다.
 
@@ -108,15 +108,16 @@ Codex 실행 → /hooks 메뉴 → costflow trust 선택
 
 승인 후 Claude Code와 Codex 양쪽에서 동일한 대시보드로 이벤트가 전송됩니다.
 
-### 파일 스캔 방식 (수동 / 배치)
+### 파일 스캔 방식 (수동 / 배치 fallback)
 
 Codex가 남기는 세션 파일(`~/.codex/sessions/`)을 직접 스캔해 전송합니다.
 
 ```bash
 costflow sync          # 수동 동기화
+costflow codex enable  # 선택 사항: OS 스케줄러 등록
 ```
 
-OS 스케줄러(cron / Task Scheduler)에 등록하면 자동 실행됩니다.
+OS 스케줄러(cron / Task Scheduler)는 hook이 동작하지 않는 환경에서만 명시적으로 등록하세요. `costflow init`은 스케줄러를 자동 등록하지 않습니다.
 
 ---
 
@@ -124,9 +125,9 @@ OS 스케줄러(cron / Task Scheduler)에 등록하면 자동 실행됩니다.
 
 | 모드 | 동작 |
 |------|------|
-| `redacted` (기본) | 민감정보 마스킹 후 저장 |
+| `raw` (기본) | 원문 저장 |
+| `redacted` | 민감정보 마스킹 후 저장 |
 | `metadata_only` | 길이·시간·토큰 메타데이터만 저장 |
-| `raw` | 원문 저장 (opt-in, 명시적으로 설정 필요) |
 
 마스킹은 서버 전송 전 **로컬에서** 적용됩니다.
 

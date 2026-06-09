@@ -4,7 +4,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { writeConfig } from '../config';
 import { addCostflowHooks, addCodexHooks } from '../settings';
-import { enableScheduler } from './codex';
 
 function promptSecret(question: string): Promise<string> {
   return new Promise((resolve) => {
@@ -78,11 +77,6 @@ export async function runInit(): Promise<void> {
     console.log('  → Codex를 열고 /hooks 메뉴에서 costflow를 trust 해주세요.');
     if (process.platform === 'win32') {
       console.log('  ⚠ Windows에서 Codex hook은 실험적 기능입니다.');
-    }
-    try {
-      await enableScheduler({ intervalMinutes: 5 });
-    } catch {
-      console.warn('  ⚠ Codex sync 스케줄러 등록 실패 — 수동으로 "costflow codex enable" 실행 필요');
     }
   }
 

@@ -38,3 +38,6 @@
 - 2026-06-10 · fix(prompts): 프롬프트 기본 저장 모드 'redacted'→'raw' 변경, Settings에 저장 모드 UI + /api/prompt-storage GET/PATCH 추가
 - 2026-06-10 · fix(cli): Codex hook 중복 등록 방지(절대경로 hook 인식 버그), flush 첫 번째 실패 시 HTTP 상태 코드 출력 추가
 - 2026-06-10 · fix(scheduler): VBScript 래퍼로 Windows 스케줄러 창 깜빡임 제거, cwd system32 고정 문제 해결
+- 2026-06-10 · fix(codex-hook-sync): Codex Stop/SessionEnd hook에서 즉시 sync 실행, UserPromptSubmit 중복 이벤트 무시, init의 5분 sync 스케줄러 자동 등록 제거, CLI 테스트 9개 통과
+  - 원인: Codex token 수집은 rollout 파일 스캔 경로에 있는데 init이 scheduler를 자동 등록해 프롬프트/작업 없이도 5분마다 sync가 실행됨.
+  - 수정: Codex hook 종료 이벤트가 들어올 때만 runSync()를 호출하고 scheduler는 `costflow codex enable` 수동 fallback으로 유지.
