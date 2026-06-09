@@ -140,8 +140,12 @@ export function hasCodexHooks(hooksJsonPath: string): boolean {
   const settings = readSettings(hooksJsonPath);
   if (!settings.hooks) return false;
 
+  const matchesCodexHook = (h: HookEntry): boolean =>
+    h.command.includes('hook --agent codex') ||
+    (h.commandWindows !== undefined && h.commandWindows.includes('hook --agent codex'));
+
   return CODEX_HOOK_EVENTS.every(event => {
     const groups = settings.hooks?.[event];
-    return groups?.some(g => g.hooks.some(h => h.command === CODEX_HOOK_COMMAND)) ?? false;
+    return groups?.some(g => g.hooks.some(matchesCodexHook)) ?? false;
   });
 }

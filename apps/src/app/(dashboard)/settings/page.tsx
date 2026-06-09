@@ -14,6 +14,14 @@ type CreateKeyResponse = {
   created_at: string;
 };
 
+type PromptMode = "raw" | "redacted" | "metadata_only";
+
+const PROMPT_MODE_LABELS: Record<PromptMode, string> = {
+  raw: "원문 저장",
+  redacted: "[redacted] 처리",
+  metadata_only: "메타데이터만 (저장 안 함)",
+};
+
 export default function SettingsPage() {
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [newKeyPlain, setNewKeyPlain] = useState<string | null>(null);
@@ -25,6 +33,8 @@ export default function SettingsPage() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
+  const [promptMode, setPromptMode] = useState<PromptMode>("raw");
+  const [savingMode, setSavingMode] = useState(false);
 
   async function loadKeys() {
     setLoadingKeys(true);
@@ -48,6 +58,10 @@ export default function SettingsPage() {
 
   useEffect(() => {
     void loadKeys();
+    void fetch("/api/prompt-storage")
+      .then((r) => r.json() as Promise<{ mode?: PromptMode }>)
+      .then((body) => { if (body.mode) setPromptMode(body.mode); })
+      .catch(() => undefined);
   }, []);
 
   async function handleCreateKey(e: React.FormEvent) {
@@ -122,9 +136,50 @@ export default function SettingsPage() {
     }
   }
 
+  async function handlePromptModeChange(mode: PromptMode) {
+    setSavingMode(true);
+    try {
+      await fetch("/api/prompt-storage", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode }),
+      });
+      setPromptMode(mode);
+    } catch {
+      // swallow
+    } finally {
+      setSavingMode(false);
+    }
+  }
+
   return (
     <main className="max-w-[960px] mx-auto py-10 px-6">
       <h1 className="text-2xl font-bold text-slate-100">Settings</h1>
+
+      <section className="mt-8">
+        <h2 className="text-slate-200 font-semibold text-sm uppercase tracking-wide mb-4">
+          프롬프트 저장 모드
+        </h2>
+        <div className="card rounded-lg divide-y divide-surface-border overflow-hidden">
+          {(["raw", "redacted", "metadata_only"] as PromptMode[]).map((mode) => (
+            <label
+              key={mode}
+              className="flex items-center gap-3 px-4 py-3 table-row-hover cursor-pointer"
+            >
+              <input
+                type="radio"
+                name="prompt-mode"
+                value={mode}
+                checked={promptMode === mode}
+                disabled={savingMode}
+                onChange={() => void handlePromptModeChange(mode)}
+                className="accent-brand-500"
+              />
+              <span className="text-zinc-200 text-sm">{PROMPT_MODE_LABELS[mode]}</span>
+            </label>
+          ))}
+        </div>
+      </section>
 
       <section className="mt-8">
         <div className="flex items-center justify-between mb-4">

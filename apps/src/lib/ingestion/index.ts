@@ -83,7 +83,7 @@ export async function processEvent(
         .eq('user_id', userId)
         .maybeSingle();
 
-      const mode = (settings?.mode as string | undefined) ?? 'redacted';
+      const mode = (settings?.mode as string | undefined) ?? 'raw';
       if (mode === 'redacted') {
         eventPayload['prompt'] = '[redacted]';
       } else if (mode === 'metadata_only') {
@@ -91,7 +91,7 @@ export async function processEvent(
       }
       // 'raw': 원문 그대로
     } catch {
-      eventPayload['prompt'] = '[redacted]';
+      eventPayload['prompt'] = null;
     }
   }
 
