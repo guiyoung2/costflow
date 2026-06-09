@@ -23,7 +23,7 @@
       "name": "uninstall-status-codex",
       "status": "completed",
       "started_at": "2026-06-09T23:59:09+0900",
-      "completed_at": "2026-06-10T00:05:00+0900",
+      "completed_at": "2026-06-10T00:00:47+0900",
       "summary": "uninstall.ts에 removeCodexHooks 호출 추가(.codex/hooks.json 존재 시), status.ts에 hasCodexHooks 호출 + 'Codex hooks: registered/not registered' 출력 추가"
     }
   ],
