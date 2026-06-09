@@ -38,12 +38,28 @@ export async function GET(request: Request) {
     }
   }
 
+  const daysParam = searchParams.get("days");
+  const daysNum = daysParam ? parseInt(daysParam, 10) : null;
+
   let query = supabase
     .from("events")
     .select("id, session_id, turn_index, created_at, payload, sessions(project_id, session_id_ext, projects(name))")
     .eq("type", "UserPromptSubmit")
     .order("created_at", { ascending: false })
     .limit(limitNum);
+
+  const dateParam = searchParams.get("date");
+  if (dateParam) {
+    const dayStart = new Date(dateParam);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(dateParam);
+    dayEnd.setHours(23, 59, 59, 999);
+    query = query.gte("created_at", dayStart.toISOString()).lte("created_at", dayEnd.toISOString());
+  } else if (daysNum && !isNaN(daysNum)) {
+    const from = new Date();
+    from.setDate(from.getDate() - daysNum);
+    query = query.gte("created_at", from.toISOString());
+  }
 
   if (sessionId) {
     query = query.eq("session_id", sessionId);

@@ -16,10 +16,14 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const projectId = searchParams.get("project_id");
   const agent = searchParams.get("agent");
-  const daysParam = searchParams.get("days");
-  const days = daysParam ? parseInt(daysParam, 10) : 30;
+  const yearParam = searchParams.get("year");
+  const monthParam = searchParams.get("month");
 
-  const cutoff = new Date(Date.now() - days * 86400_000).toISOString();
+  const now = new Date();
+  const y = yearParam ? parseInt(yearParam, 10) : now.getFullYear();
+  const m = monthParam ? parseInt(monthParam, 10) : now.getMonth() + 1;
+  const from = new Date(y, m - 1, 1).toISOString();
+  const to = new Date(y, m, 1).toISOString();
 
   let rows: Array<{ tool_name: string }> = [];
 
@@ -44,7 +48,8 @@ export async function GET(request: Request) {
       .from("tool_calls")
       .select("tool_name")
       .in("session_id", sessionIds)
-      .gte("created_at", cutoff);
+      .gte("created_at", from)
+      .lt("created_at", to);
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
@@ -55,7 +60,8 @@ export async function GET(request: Request) {
     const { data, error } = await supabase
       .from("tool_calls")
       .select("tool_name")
-      .gte("created_at", cutoff);
+      .gte("created_at", from)
+      .lt("created_at", to);
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });

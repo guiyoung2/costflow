@@ -21,10 +21,13 @@ export default function Home() {
       setError(null);
       try {
         const supabase = createClient();
+        const now = new Date();
+        const Y = now.getFullYear();
+        const M = now.getMonth() + 1;
         const [authResult, projectsRes, usageRes] = await Promise.all([
           supabase.auth.getUser(),
           fetch("/api/projects"),
-          fetch("/api/usage?days=30"),
+          fetch(`/api/usage?year=${Y}&month=${M}`),
         ]);
         setEmail(authResult.data.user?.email ?? "");
         setToday(new Date().toLocaleDateString("ko-KR", {
@@ -79,25 +82,25 @@ export default function Home() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="stat-card hover:-translate-y-1">
-          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Input Tokens (30일)</p>
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Input Tokens (이번 달)</p>
           <p className="text-2xl font-bold text-brand-400 tabular-nums mt-2">
             {totals.input_tokens.toLocaleString()}
           </p>
         </div>
         <div className="stat-card hover:-translate-y-1">
-          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Output Tokens (30일)</p>
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Output Tokens (이번 달)</p>
           <p className="text-2xl font-bold text-emerald-400 tabular-nums mt-2">
             {totals.output_tokens.toLocaleString()}
           </p>
         </div>
         <div className="stat-card hover:-translate-y-1">
-          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Cache Creation (30일)</p>
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Cache Creation (이번 달)</p>
           <p className="text-2xl font-bold text-purple-400 tabular-nums mt-2">
             {totals.cache_creation_tokens.toLocaleString()}
           </p>
         </div>
         <div className="stat-card hover:-translate-y-1">
-          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Cache Read (30일)</p>
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Cache Read (이번 달)</p>
           <p className="text-2xl font-bold text-amber-400 tabular-nums mt-2">
             {totals.cache_read_tokens.toLocaleString()}
           </p>
@@ -149,7 +152,7 @@ export default function Home() {
                 {recentProjects.map((p) => (
                   <tr key={p.id} className="table-row-hover border-t border-surface-border">
                     <td className="px-4 py-3 text-slate-300">
-                      <Link href="/projects" className="text-brand-400 hover:text-brand-300 transition-colors">
+                      <Link href={`/usage?project_id=${p.id}`} className="text-brand-400 hover:text-brand-300 transition-colors">
                         {p.name}
                       </Link>
                     </td>

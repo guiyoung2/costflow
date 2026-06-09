@@ -16,69 +16,82 @@ const AGENT_OPTIONS: { label: string; value: AgentFilter }[] = [
 ];
 
 export default function SessionsPage() {
+  const [view, setView] = useState<"grid" | "list">("grid");
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [selectedProjectName, setSelectedProjectName] = useState<string>("");
+
   const [projects, setProjects] = useState<Project[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [projectsLoading, setProjectsLoading] = useState(true);
+  const [sessionsLoading, setSessionsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [projectFilter, setProjectFilter] = useState<string>("");
   const [agentFilter, setAgentFilter] = useState<AgentFilter>(null);
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
 
-  async function loadSessions(pid?: string, agent?: AgentFilter) {
-    setLoading(true);
-    setError(null);
-    try {
-      const params = new URLSearchParams();
-      if (pid) params.set("project_id", pid);
-      if (agent) params.set("agent", agent);
-      const qs = params.toString();
-      const url = qs ? `/api/sessions?${qs}` : "/api/sessions";
-      const response = await fetch(url);
-      const body = (await response.json()) as { sessions?: Session[]; error?: string };
-      if (!response.ok) {
-        throw new Error(body.error ?? "세션 목록을 불러오지 못했습니다.");
-      }
-      setSessions(body.sessions ?? []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
   useEffect(() => {
     async function init() {
-      setLoading(true);
+      setProjectsLoading(true);
       setError(null);
       try {
-        const [projRes, sessRes] = await Promise.all([
-          fetch("/api/projects"),
-          fetch("/api/sessions"),
-        ]);
-        const projBody = (await projRes.json()) as { projects?: Project[]; error?: string };
-        const sessBody = (await sessRes.json()) as { sessions?: Session[]; error?: string };
-        if (!projRes.ok) throw new Error(projBody.error ?? "프로젝트 목록을 불러오지 못했습니다.");
-        if (!sessRes.ok) throw new Error(sessBody.error ?? "세션 목록을 불러오지 못했습니다.");
-        setProjects(projBody.projects ?? []);
-        setSessions(sessBody.sessions ?? []);
+        const res = await fetch("/api/projects");
+        const body = (await res.json()) as { projects?: Project[]; error?: string };
+        if (!res.ok) throw new Error(body.error ?? "프로젝트 목록을 불러오지 못했습니다.");
+        setProjects(body.projects ?? []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.");
       } finally {
-        setLoading(false);
+        setProjectsLoading(false);
       }
     }
     void init();
   }, []);
 
-  function handleFilterChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const pid = e.target.value;
-    setProjectFilter(pid);
-    void loadSessions(pid || undefined, agentFilter);
+  async function loadSessions(projectId: string | null, agent: AgentFilter) {
+    setSessionsLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams();
+      if (projectId) params.set("project_id", projectId);
+      if (agent) params.set("agent", agent);
+      const qs = params.toString();
+      const res = await fetch(qs ? `/api/sessions?${qs}` : "/api/sessions");
+      const body = (await res.json()) as { sessions?: Session[]; error?: string };
+      if (!res.ok) throw new Error(body.error ?? "세션 목록을 불러오지 못했습니다.");
+      setSessions(body.sessions ?? []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.");
+    } finally {
+      setSessionsLoading(false);
+    }
+  }
+
+  function handleProjectClick(project: Project) {
+    setSelectedProjectId(project.id);
+    setSelectedProjectName(project.name);
+    setAgentFilter(null);
+    setView("list");
+    void loadSessions(project.id, null);
+  }
+
+  function handleAllClick() {
+    setSelectedProjectId(null);
+    setSelectedProjectName("전체 세션");
+    setAgentFilter(null);
+    setView("list");
+    void loadSessions(null, null);
+  }
+
+  function handleBack() {
+    setView("grid");
+    setSelectedProjectId(null);
+    setSelectedProjectName("");
+    setSessions([]);
+    setAgentFilter(null);
   }
 
   function handleAgentChange(nextAgent: AgentFilter) {
     setAgentFilter(nextAgent);
-    void loadSessions(projectFilter || undefined, nextAgent);
+    void loadSessions(selectedProjectId, nextAgent);
   }
 
   async function handleDelete(id: string) {
@@ -91,9 +104,9 @@ export default function SessionsPage() {
     setError(null);
 
     try {
-      const response = await fetch(`/api/sessions/${id}`, { method: "DELETE" });
-      if (!response.ok) {
-        const body = (await response.json()) as { error?: string };
+      const res = await fetch(`/api/sessions/${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const body = (await res.json()) as { error?: string };
         throw new Error(body.error ?? "세션을 삭제하지 못했습니다.");
       }
       setSessions((current) => current.filter((s) => s.id !== id));
@@ -108,27 +121,90 @@ export default function SessionsPage() {
     }
   }
 
+  // ── Grid view ──────────────────────────────────────────────
+  if (view === "grid") {
+    return (
+      <main className="max-w-[960px] mx-auto py-10 px-6">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-bold text-zinc-100">Sessions</h1>
+            <p className="text-zinc-500 text-sm mt-1">프로젝트를 선택해 세션 내역을 확인하세요.</p>
+          </div>
+        </div>
+
+        {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
+
+        {projectsLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="card rounded-xl h-28 bg-surface-raised animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {/* 전체 카드 */}
+            <button
+              type="button"
+              onClick={handleAllClick}
+              className="card rounded-xl p-5 text-left hover:bg-surface-raised hover:border-zinc-700 transition-colors duration-150 group"
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <p className="section-label mb-1">전체</p>
+                  <h3 className="text-zinc-100 font-semibold">모든 프로젝트</h3>
+                </div>
+                <span className="text-zinc-700 group-hover:text-zinc-400 transition-colors text-base">↗</span>
+              </div>
+              <p className="text-zinc-600 text-xs">{projects.length}개 프로젝트 통합 보기</p>
+            </button>
+
+            {/* 프로젝트 카드 */}
+            {projects.map((project) => (
+              <button
+                key={project.id}
+                type="button"
+                onClick={() => handleProjectClick(project)}
+                className="card rounded-xl p-5 text-left hover:bg-surface-raised hover:border-zinc-700 transition-colors duration-150 group"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="min-w-0 flex-1 pr-2">
+                    <p className="section-label mb-1">프로젝트</p>
+                    <h3 className="text-zinc-100 font-semibold truncate">{project.name}</h3>
+                  </div>
+                  <span className="text-zinc-700 group-hover:text-zinc-400 transition-colors text-base shrink-0">↗</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-zinc-600">
+                  <span>{project.session_count}개 세션</span>
+                  {project.last_active_at && (
+                    <>
+                      <span>·</span>
+                      <span>{new Date(project.last_active_at).toLocaleDateString()}</span>
+                    </>
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+      </main>
+    );
+  }
+
+  // ── List view ──────────────────────────────────────────────
   return (
     <main className="max-w-[1200px] mx-auto py-10 px-6">
-      <h1 className="text-2xl font-bold text-slate-100">Sessions</h1>
-
-      <div className="mt-4 flex flex-wrap items-center gap-4">
-        <label htmlFor="project-filter" className="text-sm text-slate-400">
-          프로젝트:
-        </label>
-        <select
-          id="project-filter"
-          value={projectFilter}
-          onChange={handleFilterChange}
-          className="bg-surface-card border border-surface-border text-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-        >
-          <option value="">전체</option>
-          {projects.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name}
-            </option>
-          ))}
-        </select>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handleBack}
+            className="text-zinc-500 hover:text-zinc-200 text-sm transition-colors duration-150"
+          >
+            ← 목록
+          </button>
+          <span className="text-zinc-700 text-sm">/</span>
+          <h2 className="text-zinc-100 font-semibold">{selectedProjectName}</h2>
+        </div>
 
         <div className="flex gap-1 bg-surface-card rounded-lg p-1 border border-surface-border">
           {AGENT_OPTIONS.map((opt) => (
@@ -148,11 +224,11 @@ export default function SessionsPage() {
         </div>
       </div>
 
-      {error ? <p className="text-red-400 mt-3 text-sm">{error}</p> : null}
+      {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
 
-      {loading ? (
+      {sessionsLoading ? (
         <div className="mt-5">
-          <TableSkeleton rows={5} cols={12} />
+          <TableSkeleton rows={5} cols={7} />
         </div>
       ) : sessions.length === 0 ? (
         <EmptyState message="세션이 없습니다." />
@@ -161,48 +237,30 @@ export default function SessionsPage() {
           <table className="table-auto w-full text-sm">
             <thead>
               <tr className="bg-surface-card">
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">프로젝트</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Agent</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Session ID</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">시작 시간</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">종료 시간</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">모델</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Input</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Output</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Cache Creation</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Cache Read</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">Tool</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">시작 시각</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wide">Turn</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wide">Input 토큰</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wide">Tool 호출</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wide">삭제</th>
               </tr>
             </thead>
             <tbody>
               {sessions.map((s) => (
                 <tr key={s.id} className="table-row-hover border-t border-surface-border">
-                  <td className="px-4 py-3 text-brand-400 font-medium">{s.project_name}</td>
                   <td className="px-4 py-3">
                     <span className="text-xs px-1.5 py-0.5 rounded bg-surface-raised text-zinc-400 border border-surface-border">
-                      {s.agent === "codex" ? "Codex" : "CC"}
+                      {s.agent === "codex" ? "Codex" : "Claude"}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-slate-300">{s.session_id_ext.slice(0, 8)}</td>
-                  <td className="px-4 py-3 text-slate-500 text-xs">
-                    {s.started_at ? new Date(s.started_at).toLocaleString() : "-"}
+                  <td className="px-4 py-3 text-slate-300 text-xs">{s.model ?? "—"}</td>
+                  <td className="px-4 py-3 text-slate-500 text-xs tabular-nums">
+                    {s.started_at ? new Date(s.started_at).toLocaleString() : "—"}
                   </td>
-                  <td className="px-4 py-3 text-slate-500 text-xs">
-                    {s.ended_at ? new Date(s.ended_at).toLocaleString() : "-"}
-                  </td>
-                  <td className="px-4 py-3 text-slate-300">{s.model ?? "-"}</td>
+                  <td className="px-4 py-3 tabular-nums text-right text-slate-400">{s.turn_count}</td>
                   <td className="px-4 py-3 tabular-nums text-right text-slate-400">
                     {s.total_input_tokens.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-3 tabular-nums text-right text-slate-400">
-                    {s.total_output_tokens.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-3 tabular-nums text-right text-slate-400">
-                    {s.total_cache_creation_tokens.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-3 tabular-nums text-right text-slate-400">
-                    {s.total_cache_read_tokens.toLocaleString()}
                   </td>
                   <td className="px-4 py-3 tabular-nums text-right text-slate-400">
                     {s.tool_call_count.toLocaleString()}

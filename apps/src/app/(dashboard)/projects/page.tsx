@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import EmptyState from "@/components/EmptyState";
@@ -92,7 +93,14 @@ export default function ProjectsPage() {
             <tbody>
               {projects.map((project) => (
                 <tr key={project.id} className="table-row-hover border-t border-surface-border">
-                  <td className="px-4 py-3 text-zinc-100 font-medium">{project.name}</td>
+                  <td className="px-4 py-3 font-medium">
+                    <Link
+                      href={`/usage?project_id=${project.id}`}
+                      className="text-zinc-100 hover:text-brand-400 transition-colors duration-150"
+                    >
+                      {project.name}
+                    </Link>
+                  </td>
                   <td className="px-4 py-3 text-zinc-400 tabular-nums">{project.session_count}</td>
                   <td className="px-4 py-3 text-zinc-400">
                     {project.last_active_at
