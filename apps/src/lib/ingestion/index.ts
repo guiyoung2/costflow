@@ -162,13 +162,14 @@ export async function processEvent(
     event.tool_use_names.length > 0
   ) {
     try {
-      await supabase.from('tool_calls').insert(
+      await supabase.from('tool_calls').upsert(
         event.tool_use_names.map((toolName) => ({
           session_id: sessionId,
           event_id: eventId,
           turn_index: event.turn_index ?? null,
           tool_name: toolName,
         })),
+        { onConflict: 'session_id,turn_index,tool_name', ignoreDuplicates: true },
       );
     } catch {
       // swallow

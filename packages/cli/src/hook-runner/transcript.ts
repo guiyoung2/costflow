@@ -19,7 +19,7 @@ export function parseTranscript(transcriptPath: string): TranscriptSummary {
   try {
     const lines = fs.readFileSync(transcriptPath, 'utf-8').split('\n').filter((l) => l.trim());
     let lastAssistant: Record<string, unknown> | null = null;
-    let turn_index = 0;
+    let turn_index = -1;
 
     for (const line of lines) {
       try {

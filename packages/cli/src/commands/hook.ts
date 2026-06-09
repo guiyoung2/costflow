@@ -15,6 +15,9 @@ async function readStdin(): Promise<string> {
 }
 
 export async function runHook(): Promise<void> {
+  const agentIdx = process.argv.indexOf('--agent');
+  const agent = (agentIdx !== -1 ? process.argv[agentIdx + 1] : 'claude') as 'claude' | 'codex';
+
   const raw = await readStdin();
 
   let payload: Record<string, unknown>;
@@ -47,13 +50,13 @@ export async function runHook(): Promise<void> {
           turn_index = summary.turn_index;
         }
 
-        await sendEvent({ hook_type, session_id, timestamp, token_usage, model, tool_use_names, turn_index });
+        await sendEvent({ hook_type, session_id, timestamp, token_usage, model, tool_use_names, turn_index, agent });
         break;
       }
       case 'UserPromptSubmit': {
         const raw_prompt = String(payload.prompt ?? '');
         const prompt = maskPrompt(raw_prompt);
-        await sendEvent({ hook_type, session_id, timestamp, prompt });
+        await sendEvent({ hook_type, session_id, timestamp, prompt, agent });
         break;
       }
       case 'PreCompact': {
