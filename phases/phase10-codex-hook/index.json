@@ -15,7 +15,7 @@
       "name": "transcript-fix-codex-branch-dedup",
       "status": "completed",
       "started_at": "2026-06-09T23:55:38+0900",
-      "completed_at": "2026-06-09T15:30:00.000Z",
+      "completed_at": "2026-06-09T23:59:08+0900",
       "summary": "turn_index 0-based 수정, transcript.test.ts 4개 테스트, hook.ts --agent 플래그, 007 마이그레이션(UNIQUE 제약), ingestion upsert+ignoreDuplicates"
     },
     {
