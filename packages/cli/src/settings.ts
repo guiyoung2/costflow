@@ -132,7 +132,7 @@ export function hasCodexHooks(hooksJsonPath: string): boolean {
   const settings = readSettings(hooksJsonPath);
   if (!settings.hooks) return false;
 
-  return CODEX_HOOK_EVENTS.some(event => {
+  return CODEX_HOOK_EVENTS.every(event => {
     const groups = settings.hooks?.[event];
     return groups?.some(g => g.hooks.some(h => h.command === CODEX_HOOK_COMMAND)) ?? false;
   });

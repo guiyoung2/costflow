@@ -16,7 +16,8 @@ async function readStdin(): Promise<string> {
 
 export async function runHook(): Promise<void> {
   const agentIdx = process.argv.indexOf('--agent');
-  const agent = (agentIdx !== -1 ? process.argv[agentIdx + 1] : 'claude') as 'claude' | 'codex';
+  const agentRaw = agentIdx !== -1 ? process.argv[agentIdx + 1] : 'claude';
+  const agent: 'claude' | 'codex' = agentRaw === 'codex' ? 'codex' : 'claude';
 
   const raw = await readStdin();
 
