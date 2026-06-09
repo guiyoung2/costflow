@@ -19,26 +19,29 @@ npm install -g costflow-ai
 ```
 
 ```bash
-# 2. 추적할 Claude Code 프로젝트 연결
+# 2. 추적할 프로젝트 연결
 cd /path/to/your-claude-project
 costflow init
 # → Base URL: https://costflow-seven.vercel.app
 # → API key: 대시보드 Settings 페이지에서 발급
+# → Codex hook도 등록할까요? [y/N]:  ← Codex도 추적하려면 y
 ```
 
-이후 Claude Code를 평소처럼 사용하면 데이터가 자동으로 대시보드에 수집됩니다.
+이후 Claude Code(와 Codex)를 평소처럼 사용하면 데이터가 자동으로 대시보드에 수집됩니다.
 
 > 대시보드: **https://costflow-seven.vercel.app**
 
 ## 작동 방식
 
-1. `costflow init`을 실행하면 `.claude/settings.json`에 hook이 등록되고, `.costflow/project.json`에 프로젝트 메타데이터가 저장됩니다.
+1. `costflow init`을 실행하면 `.claude/settings.json`에 hook이 등록되고, `.costflow/project.json`에 프로젝트 메타데이터가 저장됩니다. Codex 연결을 선택하면 `.codex/hooks.json`에도 `Stop` / `UserPromptSubmit` hook이 함께 등록됩니다.
 
-2. Claude Code가 hook을 실행하면 `costflow hook`이 호출됩니다. hook runner는 transcript를 파싱해 토큰·tool·세션 데이터를 추출하고, 프롬프트의 민감정보를 로컬에서 마스킹한 뒤 API로 전송합니다.
+2. Codex hook은 첫 실행 시 신뢰 승인이 필요합니다. Codex에서 `/hooks` 메뉴를 열고 `costflow trust`를 선택하세요.
 
-3. 전송 실패 시에는 `~/.costflow/outbox.sqlite`에 이벤트를 보관하고 성공 종료합니다. Claude Code 작업을 막지 않으며, 다음 hook 실행 또는 `costflow flush` 시 재전송합니다.
+3. Claude Code / Codex가 hook을 실행하면 `costflow hook`이 호출됩니다. hook runner는 transcript를 파싱해 토큰·tool·세션 데이터를 추출하고, 프롬프트의 민감정보를 로컬에서 마스킹한 뒤 API로 전송합니다.
 
-4. 대시보드(`/dashboard`)에서 프로젝트별 토큰 사용량, 세션 타임라인, 마스킹된 프롬프트 내역을 조회합니다.
+4. 전송 실패 시에는 `~/.costflow/outbox.sqlite`에 이벤트를 보관하고 성공 종료합니다. 에디터 작업을 막지 않으며, 다음 hook 실행 또는 `costflow flush` 시 재전송합니다.
+
+5. 대시보드(`/dashboard`)에서 프로젝트별 토큰 사용량, 세션 타임라인, 마스킹된 프롬프트 내역을 조회합니다.
 
 ## 기술 스택
 
@@ -86,7 +89,28 @@ costflow/
 
 ## Codex 사용량 연동
 
-Codex CLI / Desktop의 세션 파일(`~/.codex/sessions/`)을 스캔해 같은 대시보드로 전송합니다.
+Codex CLI / Desktop 사용량도 같은 대시보드에서 추적할 수 있습니다. 연동 방식은 두 가지입니다.
+
+### Hook 방식 (실시간, 권장)
+
+`costflow init` 실행 중 Codex hook 등록 여부를 묻는 프롬프트에 `y`를 입력하면 `.codex/hooks.json`에 hook이 자동 등록됩니다.
+
+```
+costflow init
+→ Codex hook도 등록할까요? [y/N]: y
+```
+
+이후 Codex에서 한 번만 신뢰 승인을 해주면 됩니다.
+
+```
+Codex 실행 → /hooks 메뉴 → costflow trust 선택
+```
+
+승인 후 Claude Code와 Codex 양쪽에서 동일한 대시보드로 이벤트가 전송됩니다.
+
+### 파일 스캔 방식 (수동 / 배치)
+
+Codex가 남기는 세션 파일(`~/.codex/sessions/`)을 직접 스캔해 전송합니다.
 
 ```bash
 costflow sync          # 수동 동기화

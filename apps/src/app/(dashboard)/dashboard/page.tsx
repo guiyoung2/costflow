@@ -13,6 +13,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState<string>("");
+  const [today, setToday] = useState<string>("");
 
   useEffect(() => {
     async function init() {
@@ -26,6 +27,12 @@ export default function Home() {
           fetch("/api/usage?days=30"),
         ]);
         setEmail(authResult.data.user?.email ?? "");
+        setToday(new Date().toLocaleDateString("ko-KR", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          weekday: "long",
+        }));
         const projectsBody = (await projectsRes.json()) as {
           projects?: Project[];
           error?: string;
@@ -58,12 +65,6 @@ export default function Home() {
   );
 
   const recentProjects = projects.slice(0, 5);
-  const today = new Date().toLocaleDateString("ko-KR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    weekday: "long",
-  });
 
   return (
     <main className="max-w-5xl mx-auto space-y-8">
@@ -119,11 +120,14 @@ export default function Home() {
           <div className="stat-card">
             <p className="text-slate-300 text-sm">연결된 프로젝트가 없습니다.</p>
             <p className="text-slate-500 text-sm mt-2">
-              Settings 페이지에서 API key를 발급한 뒤, CLI로 연결하세요:
+              Settings 페이지에서 API key를 발급한 뒤, 추적할 프로젝트 폴더에서 실행하세요:
             </p>
             <pre className="mt-3 bg-surface rounded-lg p-3 text-xs text-slate-300 font-mono border border-surface-border">
-              {`npm install -g costflow\ncostflow init`}
+              {`npm install -g costflow-ai\ncd /path/to/your-claude-project\ncostflow init`}
             </pre>
+            <p className="text-slate-500 text-xs mt-3">
+              Claude Code hook이 자동 등록됩니다. Codex도 연결하려면 init 실행 중 <span className="text-slate-300">y</span>를 입력하세요.
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto rounded-xl border border-surface-border">
