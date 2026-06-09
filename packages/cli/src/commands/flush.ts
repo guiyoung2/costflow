@@ -37,9 +37,15 @@ export async function runFlush(): Promise<void> {
         successIds.push(row.id);
       } else {
         failCount++;
+        if (failCount === 1) {
+          console.warn(`  첫 번째 실패 — HTTP ${res.status}: ${await res.text().catch(() => '(응답 없음)')}`);
+        }
       }
-    } catch {
+    } catch (err) {
       failCount++;
+      if (failCount === 1) {
+        console.warn(`  첫 번째 실패 — 네트워크 에러: ${err instanceof Error ? err.message : String(err)}`);
+      }
     } finally {
       clearTimeout(timer);
     }

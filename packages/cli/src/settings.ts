@@ -87,23 +87,17 @@ export function hasCostflowHooks(settingsPath: string): boolean {
 const CODEX_HOOK_COMMAND = "costflow hook --agent codex";
 const CODEX_HOOK_EVENTS = ["Stop", "UserPromptSubmit"] as const;
 
+const isCodexHook = (h: HookEntry): boolean =>
+  h.command.includes('hook --agent codex') ||
+  (h.commandWindows !== undefined && h.commandWindows.includes('hook --agent codex'));
+
 export function addCodexHooks(hooksJsonPath: string): void {
   const settings = readSettings(hooksJsonPath);
   if (!settings.hooks) settings.hooks = {};
 
   for (const event of CODEX_HOOK_EVENTS) {
     const groups: HookGroup[] = settings.hooks[event] ?? [];
-    let alreadyExists = false;
-    for (const group of groups) {
-      for (const hook of group.hooks) {
-        if (hook.command === CODEX_HOOK_COMMAND) {
-          alreadyExists = true;
-          if (!hook.commandWindows) {
-            hook.commandWindows = CODEX_HOOK_COMMAND;
-          }
-        }
-      }
-    }
+    const alreadyExists = groups.some(g => g.hooks.some(isCodexHook));
     if (!alreadyExists) {
       groups.push({ hooks: [{ type: "command", command: CODEX_HOOK_COMMAND, commandWindows: CODEX_HOOK_COMMAND }] });
     }
@@ -123,7 +117,7 @@ export function removeCodexHooks(hooksJsonPath: string): void {
     if (!groups) continue;
 
     const filtered = groups
-      .map(g => ({ ...g, hooks: g.hooks.filter(h => h.command !== CODEX_HOOK_COMMAND) }))
+      .map(g => ({ ...g, hooks: g.hooks.filter(h => !isCodexHook(h)) }))
       .filter(g => g.hooks.length > 0);
 
     if (filtered.length === 0) {
@@ -140,12 +134,8 @@ export function hasCodexHooks(hooksJsonPath: string): boolean {
   const settings = readSettings(hooksJsonPath);
   if (!settings.hooks) return false;
 
-  const matchesCodexHook = (h: HookEntry): boolean =>
-    h.command.includes('hook --agent codex') ||
-    (h.commandWindows !== undefined && h.commandWindows.includes('hook --agent codex'));
-
   return CODEX_HOOK_EVENTS.every(event => {
     const groups = settings.hooks?.[event];
-    return groups?.some(g => g.hooks.some(matchesCodexHook)) ?? false;
+    return groups?.some(g => g.hooks.some(isCodexHook)) ?? false;
   });
 }
