@@ -91,6 +91,17 @@
 - [ ] Phase 4 step 분해 + 승인
 - [ ] `python scripts/execute.py <phase-dir>` 실행
 
+## 검증 순서 (완료 기준)
+
+```
+1. npm.cmd run build
+2. npm.cmd run typecheck
+3. npm.cmd run test --workspace=packages/cli
+```
+
+> **주의:** `apps` typecheck는 `.next/types` 생성 이후 안정적으로 동작한다.
+> clean checkout에서는 반드시 `build`를 먼저 실행한다.
+
 ## 향후 개선사항 (Phase 6 이전 처리 권장)
 
 코드 리뷰에서 식별된 Minor 항목 — 현재 기능 동작에는 영향 없음.

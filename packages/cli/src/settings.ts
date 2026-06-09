@@ -93,9 +93,17 @@ export function addCodexHooks(hooksJsonPath: string): void {
 
   for (const event of CODEX_HOOK_EVENTS) {
     const groups: HookGroup[] = settings.hooks[event] ?? [];
-    const alreadyExists = groups.some(g =>
-      g.hooks.some(h => h.command === CODEX_HOOK_COMMAND)
-    );
+    let alreadyExists = false;
+    for (const group of groups) {
+      for (const hook of group.hooks) {
+        if (hook.command === CODEX_HOOK_COMMAND) {
+          alreadyExists = true;
+          if (!hook.commandWindows) {
+            hook.commandWindows = CODEX_HOOK_COMMAND;
+          }
+        }
+      }
+    }
     if (!alreadyExists) {
       groups.push({ hooks: [{ type: "command", command: CODEX_HOOK_COMMAND, commandWindows: CODEX_HOOK_COMMAND }] });
     }
