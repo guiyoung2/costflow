@@ -1,0 +1,70 @@
+{
+  "task": "phase10-codex-hook",
+  "created_at": "2026-06-09T00:00:00+0900",
+  "features": [
+    {
+      "id": "feat-1",
+      "name": "costflow init — Codex hook 등록",
+      "description": "costflow init 실행 시 Codex hook 등록 여부를 물어보고, y 입력 시 {cwd}/.codex/hooks.json에 Stop + UserPromptSubmit hook이 등록된다",
+      "passes": true,
+      "verified_at": "2026-06-09T00:00:00+0900",
+      "verified_by_step": 1
+    },
+    {
+      "id": "feat-2",
+      "name": "settings.ts — addCodexHooks / removeCodexHooks / hasCodexHooks",
+      "description": "Codex hooks.json을 읽고 쓰는 3개 함수가 settings.ts에 존재하며, commandWindows 필드를 포함한 hook 엔트리를 생성한다",
+      "passes": true,
+      "verified_at": "2026-06-09T00:00:00+0900",
+      "verified_by_step": 1
+    },
+    {
+      "id": "feat-3",
+      "name": "transcript 0-based turn_index",
+      "description": "parseTranscript()가 0-based turn_index를 반환한다: 1턴→0, 3턴→2, no-assistant→0, no-usage→non-negative",
+      "passes": true,
+      "verified_at": "2026-06-09T15:30:00.000Z",
+      "verified_by_step": 2
+    },
+    {
+      "id": "feat-4",
+      "name": "transcript fixture 테스트 4개 통과",
+      "description": "npm test 실행 시 transcript.test.js의 4개 테스트가 모두 통과한다",
+      "passes": true,
+      "verified_at": "2026-06-09T15:30:00.000Z",
+      "verified_by_step": 2
+    },
+    {
+      "id": "feat-5",
+      "name": "hook --agent codex 플래그",
+      "description": "costflow hook --agent codex 실행 시 sendEvent에 agent='codex'가 전달되어 대시보드에 Codex 데이터가 전송된다",
+      "passes": true,
+      "verified_at": "2026-06-09T15:30:00.000Z",
+      "verified_by_step": 2
+    },
+    {
+      "id": "feat-6",
+      "name": "tool_calls UNIQUE 제약 + ignoreDuplicates",
+      "description": "DB에 UNIQUE(session_id, turn_index, tool_name) 제약이 추가되고, ingestion에서 ignoreDuplicates가 적용되어 retry 시 중복 삽입이 방지된다",
+      "passes": true,
+      "verified_at": "2026-06-09T15:30:00.000Z",
+      "verified_by_step": 2
+    },
+    {
+      "id": "feat-7",
+      "name": "costflow uninstall — Codex hook 제거",
+      "description": "costflow uninstall 실행 시 .codex/hooks.json이 존재하면 costflow hook 엔트리가 제거된다 (파일 자체는 삭제 안 함)",
+      "passes": false,
+      "verified_at": null,
+      "verified_by_step": null
+    },
+    {
+      "id": "feat-8",
+      "name": "costflow status — Codex hook 상태 표시",
+      "description": "costflow status 출력에 'Codex hooks: registered/not registered' 줄이 포함된다",
+      "passes": false,
+      "verified_at": null,
+      "verified_by_step": null
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "project": "costflow",
+  "phase": "phase10-codex-hook",
+  "steps": [
+    {
+      "step": 1,
+      "name": "codex-hook-settings-init",
+      "status": "completed",
+      "started_at": "2026-06-09T23:53:09+0900",
+      "summary": "settings.ts에 addCodexHooks/removeCodexHooks/hasCodexHooks 추가, init.ts에 Codex hook 등록 질문 분기 추가",
+      "completed_at": "2026-06-09T23:55:38+0900"
+    },
+    {
+      "step": 2,
+      "name": "transcript-fix-codex-branch-dedup",
+      "status": "completed",
+      "started_at": "2026-06-09T23:55:38+0900",
+      "completed_at": "2026-06-09T15:30:00.000Z",
+      "summary": "turn_index 0-based 수정, transcript.test.ts 4개 테스트, hook.ts --agent 플래그, 007 마이그레이션(UNIQUE 제약), ingestion upsert+ignoreDuplicates"
+    },
+    {
+      "step": 3,
+      "name": "uninstall-status-codex",
+      "status": "pending"
+    }
+  ],
+  "created_at": "2026-06-09T23:53:09+0900"
+}
