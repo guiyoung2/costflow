@@ -20,6 +20,7 @@ export async function GET(request: Request) {
   let query = supabase
     .from("sessions")
     .select("*, projects(name)")
+    .not("model", "is", null)
     .order("started_at", { ascending: false })
     .limit(100);
 

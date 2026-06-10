@@ -42,5 +42,8 @@
 - 2026-06-10 · feat(prompts-calendar): Prompts 리스트뷰 날짜 버튼→DayPicker 교체, /api/prompts/available-dates 신규, /api/prompts date 파라미터 추가
 - 2026-06-10 · feat(sessions-grid): Sessions 페이지 그리드↔리스트 2-view 재설계 (Prompts 패턴 동일)
 - 2026-06-10 · feat(nav-usage): Projects/Home 프로젝트 링크 /usage?project_id=X 변경, Usage 페이지 URL project_id 파라미터 읽기, Home stat-card 레이블 "이번 달"로 변경
+- 2026-06-11 · fix(sessions-empty): sessions API에 model IS NOT NULL 필터 추가 — Stop hook 없이 종료된 빈 세션 UI에서 숨김
+- 2026-06-11 · feat(prompts-layout): Prompts list view 달력 상단 + 프롬프트 하단 세로 레이아웃으로 변경
+- 2026-06-11 · fix(token-input): Claude input_tokens를 cache_read+cache_creation 합산으로 변경(Codex와 동일 기준), 기존 44개 turn_usage 행 DB 업데이트
   - 원인: Codex token 수집은 rollout 파일 스캔 경로에 있는데 init이 scheduler를 자동 등록해 프롬프트/작업 없이도 5분마다 sync가 실행됨.
   - 수정: Codex hook 종료 이벤트가 들어올 때만 runSync()를 호출하고 scheduler는 `costflow codex enable` 수동 fallback으로 유지.

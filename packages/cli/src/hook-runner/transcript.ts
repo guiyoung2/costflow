@@ -66,7 +66,7 @@ export function parseTranscript(transcriptPath: string): TranscriptSummary {
     return {
       model,
       token_usage: {
-        input_tokens,
+        input_tokens: input_tokens + cache_creation_tokens + cache_read_tokens,
         output_tokens,
         cache_creation_tokens,
         cache_read_tokens,

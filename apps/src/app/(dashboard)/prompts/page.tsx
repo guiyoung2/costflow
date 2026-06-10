@@ -274,9 +274,9 @@ export default function PromptsPage() {
 
       {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
 
-      <div className="flex gap-6 items-start">
-        {/* 달력 사이드바 */}
-        <div className="shrink-0">
+      <div className="flex flex-col gap-5">
+        {/* 달력 */}
+        <div className="flex items-end gap-3">
           <DayPicker
             mode="single"
             selected={selectedDate ?? undefined}
@@ -290,15 +290,17 @@ export default function PromptsPage() {
             <button
               type="button"
               onClick={handleClearDate}
-              className="mt-2 w-full text-center text-xs text-zinc-500 hover:text-zinc-300 py-1.5 rounded-md hover:bg-surface-raised transition-colors"
+              className="text-xs text-zinc-500 hover:text-zinc-300 py-1.5 px-3 rounded-md hover:bg-surface-raised transition-colors border border-surface-border"
             >
               전체 보기
             </button>
           )}
         </div>
 
+        <div className="border-t border-surface-border" />
+
         {/* 프롬프트 목록 */}
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0">
           {promptsLoading ? (
             <div className="flex flex-col gap-2">
               {Array.from({ length: 4 }).map((_, i) => (
