@@ -66,6 +66,10 @@ export default function PromptsPage() {
   const [availableDates, setAvailableDates] = useState<Date[]>([]);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
+  const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
+  const [editingValue, setEditingValue] = useState<string>("");
+  const [savingSessionIds, setSavingSessionIds] = useState<Set<string>>(new Set());
+
   useEffect(() => {
     async function init() {
       setProjectsLoading(true);
@@ -186,6 +190,62 @@ export default function PromptsPage() {
       else next.add(id);
       return next;
     });
+  }
+
+  function startEditingSession(sessionId: string, currentTitle: string | null) {
+    setEditingSessionId(sessionId);
+    setEditingValue(currentTitle ?? "");
+  }
+
+  async function saveSessionTitle(sessionId: string) {
+    if (savingSessionIds.has(sessionId)) return;
+    setEditingSessionId(null);
+
+    const trimmed = editingValue.trim() || null;
+    setSavingSessionIds((prev) => new Set(prev).add(sessionId));
+    try {
+      const res = await fetch(`/api/sessions/${sessionId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ custom_title: trimmed }),
+      });
+      if (res.ok) {
+        setPrompts((prev) =>
+          prev.map((p) =>
+            p.session_id === sessionId ? { ...p, session_title: trimmed } : p
+          )
+        );
+      }
+    } finally {
+      setSavingSessionIds((prev) => {
+        const next = new Set(prev);
+        next.delete(sessionId);
+        return next;
+      });
+    }
+  }
+
+  // session_id 첫 등장 순서 기준으로 세션 그룹핑 (이미 created_at desc 정렬)
+  function groupBySession(promptList: Prompt[]): {
+    sessionId: string;
+    sessionTitle: string | null;
+    firstTimestamp: string;
+    items: Prompt[];
+  }[] {
+    const order: string[] = [];
+    const map: Record<string, { sessionTitle: string | null; firstTimestamp: string; items: Prompt[] }> = {};
+    for (const p of promptList) {
+      if (!map[p.session_id]) {
+        order.push(p.session_id);
+        map[p.session_id] = {
+          sessionTitle: p.session_title,
+          firstTimestamp: p.timestamp,
+          items: [],
+        };
+      }
+      map[p.session_id].items.push(p);
+    }
+    return order.map((sid) => ({ sessionId: sid, ...map[sid] }));
   }
 
   // ── Grid view ──────────────────────────────────────────────
@@ -312,44 +372,86 @@ export default function PromptsPage() {
               <p>해당 날짜에 프롬프트 기록이 없습니다.</p>
             </div>
           ) : (
-            <div className="flex flex-col gap-2">
-              {prompts.map((p) => {
-                const isExpanded = expandedIds.has(p.id);
-                const isLong =
-                  typeof p.prompt === "string" &&
-                  p.prompt !== "[redacted]" &&
-                  p.prompt.length > 200;
+            <div className="flex flex-col gap-6">
+              {groupBySession(prompts).map((group) => {
+                const isEditing = editingSessionId === group.sessionId;
+                const isSaving = savingSessionIds.has(group.sessionId);
                 return (
-                  <div key={p.id} className="card rounded-xl p-4">
-                    <div className="flex items-center gap-2 mb-2.5">
+                  <div key={group.sessionId}>
+                    {/* 세션 그룹 헤더 */}
+                    <div className="flex items-center gap-3 py-3 border-b border-surface-border mb-2">
+                      {isEditing ? (
+                        <input
+                          autoFocus
+                          className="flex-1 bg-transparent text-zinc-100 font-semibold text-sm outline-none border-b border-brand-600 pb-0.5"
+                          value={editingValue}
+                          onChange={(e) => setEditingValue(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") void saveSessionTitle(group.sessionId);
+                            if (e.key === "Escape") setEditingSessionId(null);
+                          }}
+                          onBlur={() => void saveSessionTitle(group.sessionId)}
+                        />
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => startEditingSession(group.sessionId, group.sessionTitle)}
+                          className="flex-1 text-left text-zinc-100 font-semibold text-sm hover:text-zinc-300 transition-colors truncate"
+                          disabled={isSaving}
+                        >
+                          {group.sessionTitle ?? "(제목 없음)"}
+                        </button>
+                      )}
                       <span className="text-zinc-600 text-xs tabular-nums shrink-0">
-                        {new Date(p.timestamp).toLocaleString()}
+                        {new Date(group.firstTimestamp).toLocaleString()}
                       </span>
-                      {!selectedProjectId && (
-                        <>
-                          <span className="text-zinc-700 text-xs">·</span>
-                          <span className="text-zinc-500 text-xs truncate">{p.project_name}</span>
-                        </>
-                      )}
-                      {p.turn_index !== null && (
-                        <>
-                          <span className="text-zinc-700 text-xs">·</span>
-                          <span className="text-zinc-600 text-xs">turn {p.turn_index}</span>
-                        </>
-                      )}
+                      <span className="text-zinc-700 text-xs shrink-0">·</span>
+                      <span className="text-zinc-600 text-xs shrink-0">{group.items.length} turns</span>
                     </div>
-                    <div className="font-mono text-sm bg-surface border border-surface-border p-3 rounded-lg text-zinc-300">
-                      {renderContent(p.prompt, isExpanded)}
+
+                    {/* 세션 내 프롬프트 카드 */}
+                    <div className="flex flex-col gap-2">
+                      {group.items.map((p) => {
+                        const isExpanded = expandedIds.has(p.id);
+                        const isLong =
+                          typeof p.prompt === "string" &&
+                          p.prompt !== "[redacted]" &&
+                          p.prompt.length > 200;
+                        return (
+                          <div key={p.id} className="card rounded-xl p-4">
+                            <div className="flex items-center gap-2 mb-2.5">
+                              <span className="text-zinc-600 text-xs tabular-nums shrink-0">
+                                {new Date(p.timestamp).toLocaleString()}
+                              </span>
+                              {!selectedProjectId && (
+                                <>
+                                  <span className="text-zinc-700 text-xs">·</span>
+                                  <span className="text-zinc-500 text-xs truncate">{p.project_name}</span>
+                                </>
+                              )}
+                              {p.turn_index !== null && (
+                                <>
+                                  <span className="text-zinc-700 text-xs">·</span>
+                                  <span className="text-zinc-600 text-xs">turn {p.turn_index}</span>
+                                </>
+                              )}
+                            </div>
+                            <div className="font-mono text-sm bg-surface border border-surface-border p-3 rounded-lg text-zinc-300">
+                              {renderContent(p.prompt, isExpanded)}
+                            </div>
+                            {isLong && (
+                              <button
+                                type="button"
+                                onClick={() => toggleExpand(p.id)}
+                                className="mt-2 text-xs text-zinc-600 hover:text-zinc-300 transition-colors duration-150"
+                              >
+                                {isExpanded ? "접기 ↑" : "전체 보기 ↓"}
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
-                    {isLong && (
-                      <button
-                        type="button"
-                        onClick={() => toggleExpand(p.id)}
-                        className="mt-2 text-xs text-zinc-600 hover:text-zinc-300 transition-colors duration-150"
-                      >
-                        {isExpanded ? "접기 ↑" : "전체 보기 ↓"}
-                      </button>
-                    )}
                   </div>
                 );
               })}

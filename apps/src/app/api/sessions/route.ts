@@ -16,6 +16,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const projectId = searchParams.get("project_id");
   const agent = searchParams.get("agent");
+  const date = searchParams.get("date");
 
   let query = supabase
     .from("sessions")
@@ -29,6 +30,9 @@ export async function GET(request: Request) {
   }
   if (agent) {
     query = query.eq("agent", agent);
+  }
+  if (date) {
+    query = query.gte("started_at", `${date}T00:00:00.000Z`).lte("started_at", `${date}T23:59:59.999Z`);
   }
 
   const { data: sessions, error: sessionsError } = await query;
@@ -90,6 +94,30 @@ export async function GET(request: Request) {
     // tool_call_count는 부가 정보 — 실패 시 0으로 fallback
   }
 
+  // 각 세션의 첫 번째 UserPromptSubmit 이벤트 조회 (min turn_index)
+  const firstPromptMap = new Map<string, string>();
+  try {
+    const { data: promptEvents } = await supabase
+      .from("events")
+      .select("session_id, turn_index, payload")
+      .in("session_id", sessionIds)
+      .eq("type", "UserPromptSubmit")
+      .order("turn_index", { ascending: true });
+
+    // 세션별 min turn_index 기준 첫 번째 이벤트만 보관
+    for (const ev of promptEvents ?? []) {
+      if (!firstPromptMap.has(ev.session_id)) {
+        const payload = ev.payload as { prompt?: string } | null;
+        const prompt = payload?.prompt ?? null;
+        if (prompt !== null) {
+          firstPromptMap.set(ev.session_id, prompt);
+        }
+      }
+    }
+  } catch {
+    // first_prompt는 부가 정보 — 실패 시 null로 fallback
+  }
+
   const result: Session[] = (sessions ?? []).map((s) => {
     const agg = usageMap.get(s.id) ?? {
       turn_count: 0,
@@ -114,6 +142,8 @@ export async function GET(request: Request) {
       total_cache_read_tokens: agg.cache_read,
       tool_call_count: toolCountMap.get(s.id) ?? 0,
       agent: (s.agent as string) ?? "claude",
+      custom_title: (s.custom_title as string | null) ?? null,
+      first_prompt: firstPromptMap.get(s.id) ?? null,
     };
   });
 

@@ -13,4 +13,6 @@ export type Session = {
   total_cache_read_tokens: number;
   tool_call_count: number;
   agent: string;
+  custom_title: string | null;
+  first_prompt: string | null;
 };

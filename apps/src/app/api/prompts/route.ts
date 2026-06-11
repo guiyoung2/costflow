@@ -43,7 +43,7 @@ export async function GET(request: Request) {
 
   let query = supabase
     .from("events")
-    .select("id, session_id, turn_index, created_at, payload, sessions(project_id, session_id_ext, projects(name))")
+    .select("id, session_id, turn_index, created_at, payload, sessions(project_id, session_id_ext, custom_title, projects(name))")
     .eq("type", "UserPromptSubmit")
     .order("created_at", { ascending: false })
     .limit(limitNum);
@@ -73,17 +73,54 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  // Collect unique session IDs from the current result set
+  const uniqueSessionIds = [...new Set((events ?? []).map((e) => e.session_id))];
+
+  // Fetch the first UserPromptSubmit per session (lowest turn_index) for session_title fallback
+  const firstPromptMap = new Map<string, string>();
+  if (uniqueSessionIds.length > 0) {
+    const { data: firstEvents } = await supabase
+      .from("events")
+      .select("session_id, turn_index, payload")
+      .eq("type", "UserPromptSubmit")
+      .in("session_id", uniqueSessionIds)
+      .order("turn_index", { ascending: true });
+
+    if (firstEvents) {
+      for (const fe of firstEvents) {
+        if (!firstPromptMap.has(fe.session_id)) {
+          const p = (fe.payload as Record<string, unknown> | null)?.prompt;
+          if (typeof p === "string" && p.length > 0) {
+            firstPromptMap.set(fe.session_id, p);
+          }
+        }
+      }
+    }
+  }
+
   const prompts: Prompt[] = (events ?? []).map((e) => {
     const payload = e.payload as Record<string, unknown> | null;
     const sessionField = e.sessions as unknown as {
       project_id: string;
       session_id_ext: string;
+      custom_title: string | null;
       projects: { name: string } | null;
     } | null;
+
+    const customTitle = sessionField?.custom_title ?? null;
+    const firstPrompt = firstPromptMap.get(e.session_id) ?? null;
+    let session_title: string | null = null;
+    if (customTitle) {
+      session_title = customTitle;
+    } else if (firstPrompt) {
+      session_title = firstPrompt.length > 60 ? firstPrompt.slice(0, 60) + "…" : firstPrompt;
+    }
 
     return {
       id: e.id,
       session_id: e.session_id,
+      session_id_ext: sessionField?.session_id_ext ?? "",
+      session_title,
       project_name: sessionField?.projects?.name ?? "",
       timestamp: (payload?.timestamp as string | undefined) ?? e.created_at,
       prompt: (payload?.prompt as string | undefined) ?? null,
