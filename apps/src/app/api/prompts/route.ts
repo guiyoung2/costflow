@@ -16,16 +16,18 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const sessionId = searchParams.get("session_id");
   const projectId = searchParams.get("project_id");
+  const agentParam = searchParams.get("agent");
   const limitParam = searchParams.get("limit");
   const limitNum = limitParam ? parseInt(limitParam, 10) : 50;
 
   let sessionIds: string[] | null = null;
 
-  if (projectId) {
-    const { data: sessions, error: sessionsError } = await supabase
-      .from("sessions")
-      .select("id")
-      .eq("project_id", projectId);
+  if (projectId || agentParam) {
+    let sessionsQuery = supabase.from("sessions").select("id");
+    if (projectId) sessionsQuery = sessionsQuery.eq("project_id", projectId);
+    if (agentParam) sessionsQuery = sessionsQuery.eq("agent", agentParam);
+
+    const { data: sessions, error: sessionsError } = await sessionsQuery;
 
     if (sessionsError) {
       return NextResponse.json({ error: sessionsError.message }, { status: 500 });

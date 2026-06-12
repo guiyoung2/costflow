@@ -7,6 +7,14 @@ import { DayPicker } from "react-day-picker";
 import type { Project } from "@/types/project";
 import type { Prompt } from "@/types/prompt";
 
+type AgentFilter = "claude" | "codex" | null;
+
+const AGENT_OPTIONS: { label: string; value: AgentFilter }[] = [
+  { label: "전체", value: null },
+  { label: "Claude Code", value: "claude" },
+  { label: "Codex", value: "codex" },
+];
+
 function isSameDay(a: Date, b: Date): boolean {
   return (
     a.getFullYear() === b.getFullYear() &&
@@ -66,6 +74,9 @@ export default function PromptsPage() {
   const [availableDates, setAvailableDates] = useState<Date[]>([]);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
+  const [agentFilter, setAgentFilter] = useState<AgentFilter>(null);
+  const [collapsedSessions, setCollapsedSessions] = useState<Set<string>>(new Set());
+
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState<string>("");
   const [savingSessionIds, setSavingSessionIds] = useState<Set<string>>(new Set());
@@ -86,8 +97,8 @@ export default function PromptsPage() {
           setSelectedProjectId(pid);
           setSelectedProjectName(proj?.name ?? "프로젝트");
           setView("list");
-          void loadPrompts(pid, null);
-          void loadAvailableDates(pid);
+          void loadPrompts(pid, null, null);
+          void loadAvailableDates(pid, null);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "알 수 없는 오류");
@@ -99,9 +110,10 @@ export default function PromptsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function loadAvailableDates(projectId: string | null) {
+  async function loadAvailableDates(projectId: string | null, agent: AgentFilter) {
     const params = new URLSearchParams();
     if (projectId) params.set("project_id", projectId);
+    if (agent) params.set("agent", agent);
     const qs = params.toString();
     try {
       const res = await fetch(qs ? `/api/prompts/available-dates?${qs}` : "/api/prompts/available-dates");
@@ -114,13 +126,14 @@ export default function PromptsPage() {
     }
   }
 
-  async function loadPrompts(projectId: string | null, date: string | null) {
+  async function loadPrompts(projectId: string | null, date: string | null, agent: AgentFilter) {
     setPromptsLoading(true);
     setError(null);
     try {
       const params = new URLSearchParams();
       if (projectId) params.set("project_id", projectId);
       if (date) params.set("date", date);
+      if (agent) params.set("agent", agent);
       const qs = params.toString();
       const res = await fetch(qs ? `/api/prompts?${qs}` : "/api/prompts");
       const body = (await res.json()) as { prompts?: Prompt[]; error?: string };
@@ -136,41 +149,54 @@ export default function PromptsPage() {
   function handleProjectClick(project: Project) {
     setSelectedProjectId(project.id);
     setSelectedProjectName(project.name);
+    setAgentFilter(null);
     setSelectedDate(null);
     setAvailableDates([]);
     setExpandedIds(new Set());
+    setCollapsedSessions(new Set());
     setView("list");
-    void loadPrompts(project.id, null);
-    void loadAvailableDates(project.id);
+    void loadPrompts(project.id, null, null);
+    void loadAvailableDates(project.id, null);
   }
 
   function handleAllClick() {
     setSelectedProjectId(null);
     setSelectedProjectName("전체 프롬프트");
+    setAgentFilter(null);
     setSelectedDate(null);
     setAvailableDates([]);
     setExpandedIds(new Set());
+    setCollapsedSessions(new Set());
     setView("list");
-    void loadPrompts(null, null);
-    void loadAvailableDates(null);
+    void loadPrompts(null, null, null);
+    void loadAvailableDates(null, null);
+  }
+
+  function handleAgentChange(nextAgent: AgentFilter) {
+    setAgentFilter(nextAgent);
+    setSelectedDate(null);
+    setCollapsedSessions(new Set());
+    void loadPrompts(selectedProjectId, null, nextAgent);
+    void loadAvailableDates(selectedProjectId, nextAgent);
   }
 
   function handleDateSelect(date: Date | undefined) {
     const next = date ?? null;
     setSelectedDate(next);
+    setCollapsedSessions(new Set());
     if (next) {
       const yyyy = next.getFullYear();
       const mm = String(next.getMonth() + 1).padStart(2, "0");
       const dd = String(next.getDate()).padStart(2, "0");
-      void loadPrompts(selectedProjectId, `${yyyy}-${mm}-${dd}`);
+      void loadPrompts(selectedProjectId, `${yyyy}-${mm}-${dd}`, agentFilter);
     } else {
-      void loadPrompts(selectedProjectId, null);
+      void loadPrompts(selectedProjectId, null, agentFilter);
     }
   }
 
   function handleClearDate() {
     setSelectedDate(null);
-    void loadPrompts(selectedProjectId, null);
+    void loadPrompts(selectedProjectId, null, agentFilter);
   }
 
   function handleBack() {
@@ -178,9 +204,20 @@ export default function PromptsPage() {
     setSelectedProjectId(null);
     setSelectedProjectName("");
     setPrompts([]);
+    setAgentFilter(null);
     setSelectedDate(null);
     setAvailableDates([]);
     setExpandedIds(new Set());
+    setCollapsedSessions(new Set());
+  }
+
+  function toggleSession(sessionId: string) {
+    setCollapsedSessions((prev) => {
+      const next = new Set(prev);
+      if (next.has(sessionId)) next.delete(sessionId);
+      else next.add(sessionId);
+      return next;
+    });
   }
 
   function toggleExpand(id: string) {
@@ -320,16 +357,35 @@ export default function PromptsPage() {
   // ── List view ──────────────────────────────────────────────
   return (
     <main className="max-w-[960px] mx-auto py-10 px-6">
-      <div className="flex items-center gap-3 mb-6">
-        <button
-          type="button"
-          onClick={handleBack}
-          className="text-zinc-500 hover:text-zinc-200 text-sm transition-colors duration-150"
-        >
-          ← 목록
-        </button>
-        <span className="text-zinc-700 text-sm">/</span>
-        <h2 className="text-zinc-100 font-semibold">{selectedProjectName}</h2>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handleBack}
+            className="text-zinc-500 hover:text-zinc-200 text-sm transition-colors duration-150"
+          >
+            ← 목록
+          </button>
+          <span className="text-zinc-700 text-sm">/</span>
+          <h2 className="text-zinc-100 font-semibold">{selectedProjectName}</h2>
+        </div>
+
+        <div className="flex gap-1 bg-surface-card rounded-lg p-1 border border-surface-border">
+          {AGENT_OPTIONS.map((opt) => (
+            <button
+              key={opt.value ?? "all"}
+              type="button"
+              onClick={() => handleAgentChange(opt.value)}
+              className={
+                agentFilter === opt.value
+                  ? "bg-brand-600 text-white rounded-md px-4 py-1.5 text-sm font-medium transition-all"
+                  : "text-slate-400 hover:text-white px-4 py-1.5 text-sm rounded-md transition-colors"
+              }
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
@@ -376,10 +432,18 @@ export default function PromptsPage() {
               {groupBySession(prompts).map((group) => {
                 const isEditing = editingSessionId === group.sessionId;
                 const isSaving = savingSessionIds.has(group.sessionId);
+                const isCollapsed = collapsedSessions.has(group.sessionId);
                 return (
                   <div key={group.sessionId}>
                     {/* 세션 그룹 헤더 */}
-                    <div className="flex items-center gap-3 py-3 border-b border-surface-border mb-2">
+                    <div className="flex items-center gap-2 py-3 border-b border-surface-border mb-2">
+                      <button
+                        type="button"
+                        onClick={() => toggleSession(group.sessionId)}
+                        className="text-zinc-600 hover:text-zinc-300 transition-colors shrink-0 w-4 text-xs"
+                      >
+                        {isCollapsed ? "▶" : "▼"}
+                      </button>
                       {isEditing ? (
                         <input
                           autoFocus
@@ -410,7 +474,7 @@ export default function PromptsPage() {
                     </div>
 
                     {/* 세션 내 프롬프트 카드 */}
-                    <div className="flex flex-col gap-2">
+                    {!isCollapsed && <div className="flex flex-col gap-2">
                       {group.items.map((p) => {
                         const isExpanded = expandedIds.has(p.id);
                         const isLong =
@@ -451,7 +515,7 @@ export default function PromptsPage() {
                           </div>
                         );
                       })}
-                    </div>
+                    </div>}
                   </div>
                 );
               })}

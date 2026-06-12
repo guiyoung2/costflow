@@ -14,14 +14,16 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const projectId = searchParams.get("project_id");
+  const agentParam = searchParams.get("agent");
 
   let sessionIds: string[] | null = null;
 
-  if (projectId) {
-    const { data: sessions, error: sessErr } = await supabase
-      .from("sessions")
-      .select("id")
-      .eq("project_id", projectId);
+  if (projectId || agentParam) {
+    let sessionsQuery = supabase.from("sessions").select("id");
+    if (projectId) sessionsQuery = sessionsQuery.eq("project_id", projectId);
+    if (agentParam) sessionsQuery = sessionsQuery.eq("agent", agentParam);
+
+    const { data: sessions, error: sessErr } = await sessionsQuery;
 
     if (sessErr) {
       return NextResponse.json({ error: sessErr.message }, { status: 500 });

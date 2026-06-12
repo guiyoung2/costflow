@@ -71,6 +71,7 @@ export default function SessionsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState<string>("");
   const [savingIds, setSavingIds] = useState<Set<string>>(new Set());
+  const [collapsedDates, setCollapsedDates] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     async function init() {
@@ -156,6 +157,16 @@ export default function SessionsPage() {
     setAgentFilter(null);
     setSelectedDate(null);
     setAvailableDates([]);
+    setCollapsedDates(new Set());
+  }
+
+  function toggleDate(dateKey: string) {
+    setCollapsedDates((prev) => {
+      const next = new Set(prev);
+      if (next.has(dateKey)) next.delete(dateKey);
+      else next.add(dateKey);
+      return next;
+    });
   }
 
   function handleAgentChange(nextAgent: AgentFilter) {
@@ -386,10 +397,21 @@ export default function SessionsPage() {
         ) : sessions.length === 0 ? (
           <EmptyState message="세션이 없습니다." />
         ) : (
-          <div className="flex flex-col gap-6">
-            {dateKeys.map((dateKey) => (
+          <div className="flex flex-col gap-4">
+            {dateKeys.map((dateKey) => {
+              const isCollapsed = collapsedDates.has(dateKey);
+              return (
               <div key={dateKey}>
-                <p className="text-zinc-500 text-xs font-medium py-2">{getDateLabel(dateKey)}</p>
+                <button
+                  type="button"
+                  onClick={() => toggleDate(dateKey)}
+                  className="flex items-center gap-2 w-full text-left py-2 group"
+                >
+                  <span className="text-zinc-600 text-xs">{isCollapsed ? "▶" : "▼"}</span>
+                  <span className="text-zinc-500 text-xs font-medium group-hover:text-zinc-300 transition-colors">{getDateLabel(dateKey)}</span>
+                  <span className="text-zinc-700 text-xs">· {grouped[dateKey].length}개 세션</span>
+                </button>
+                {!isCollapsed && (
                 <div className="overflow-x-auto rounded-xl border border-surface-border">
                   <table className="table-auto w-full text-sm">
                     <thead>
@@ -464,8 +486,10 @@ export default function SessionsPage() {
                     </tbody>
                   </table>
                 </div>
+                )}
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

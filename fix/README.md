@@ -39,6 +39,7 @@
 - 2026-06-10 · fix(cli): Codex hook 중복 등록 방지(절대경로 hook 인식 버그), flush 첫 번째 실패 시 HTTP 상태 코드 출력 추가
 - 2026-06-10 · fix(scheduler): VBScript 래퍼로 Windows 스케줄러 창 깜빡임 제거, cwd system32 고정 문제 해결
 - 2026-06-10 · fix(codex-hook-sync): Codex Stop/SessionEnd hook에서 즉시 sync 실행, UserPromptSubmit 중복 이벤트 무시, init의 5분 sync 스케줄러 자동 등록 제거, CLI 테스트 9개 통과
+- 2026-06-12 · feat(sessions-prompts-ux): Sessions 날짜 그룹 접기/펼치기, Prompts 세션 그룹 접기/펼치기 + Agent 필터(전체/Claude Code/Codex) 추가, /api/prompts·available-dates에 agent 파라미터 지원
 - 2026-06-10 · feat(prompts-calendar): Prompts 리스트뷰 날짜 버튼→DayPicker 교체, /api/prompts/available-dates 신규, /api/prompts date 파라미터 추가
 - 2026-06-10 · feat(sessions-grid): Sessions 페이지 그리드↔리스트 2-view 재설계 (Prompts 패턴 동일)
 - 2026-06-10 · feat(nav-usage): Projects/Home 프로젝트 링크 /usage?project_id=X 변경, Usage 페이지 URL project_id 파라미터 읽기, Home stat-card 레이블 "이번 달"로 변경
